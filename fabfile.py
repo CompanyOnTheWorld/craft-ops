@@ -297,20 +297,13 @@ def setup():
     success, result = bb.ssh.create(public_key, project['short_name'])
     pprint.pprint(result)
 
-    with settings(warn_only=True):
-        has_git = local("git rev-parse", capture=True)
-
-    if has_git.return_code != "0":
+    has_git_dir = local("test -d .git", capture=True)
+    if has_git_dir.return_code != "0":
         local("git init")
-        local("git add .")
-        local("git commit -am 'initial commit'")
 
     git_remotes = local("git remote", capture=True)
-
     if "bitbucket" not in git_remotes:
         local("git remote add bitbucket "+repo_url)
-
-    local("git push -u bitbucket master")
 
     #
     # Update YAML
@@ -320,6 +313,10 @@ def setup():
 
     with open('project.conf', 'w') as project_file:
         project_file.write(new_project_yaml)
+
+    local("git add .")
+    local("git commit -am 'setting up Craft Ops'")
+    local("git push -u bitbucket master")
 
 
 @task
