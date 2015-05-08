@@ -299,16 +299,19 @@ def setup():
 
     with settings(warn_only=True):
         has_git = local("git rev-parse", capture=True)
+
+    git_remotes = local("git remote", capture=True)
         
     if has_git.return_code != "0":
         local("git init")
-        local("git remote add origin "+repo_url)
-        local("git add .")
-        local("git commit -am 'initial commit'")
-        local("git push -u origin master")
-    else:
-        with settings(warn_only=True):
-            local("git remote add origin "+repo_url)
+
+    if "origin" in git_remotes:
+        local("git remote rm origin")
+
+    local("git remote add origin "+repo_url)
+    local("git add .")
+    local("git commit -am 'initial commit'")
+    local("git push -u origin master")
 
     #
     # Update YAML
