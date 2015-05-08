@@ -297,13 +297,15 @@ def setup():
     success, result = bb.ssh.create(public_key, project['short_name'])
     pprint.pprint(result)
 
-    has_git_dir = local("test -d .git", capture=True)
-    if has_git_dir.return_code != "0":
-        local("git init")
+    with settings(warn_only=True):
+        has_git_dir = local("test -d .git", capture=True)
+        if has_git_dir.return_code != "0":
+            local("git init")
 
-    has_develop_branch = local("git show-branch --list | grep develop", capture=True)
-    if has_git_dir.return_code != "0":
-        local("git checkout -b develop")
+    with settings(warn_only=True):
+        has_develop_branch = local("git show-branch --list | grep develop", capture=True)
+        if has_git_dir.return_code != "0":
+            local("git checkout -b develop")
 
     git_remotes = local("git remote", capture=True)
     if "bitbucket" not in git_remotes:
