@@ -26,10 +26,11 @@ Clone this repo as the name of your project.
 git clone https://github.com/stackstrap/craft-ops.git project_name
 ```
 
-Come up with a `short_name` value for  your project. This is a name that
-will be used for naming things in the system. It should be short and easy to
-type. You will need to enter this value into the proper place in the
-`project.conf` file.
+Come up with a `short_name` value your project. This value will be
+used to label things in the system. It should be short and easy to
+type. Try to leave out special characters or things could fail.
+You will need to enter this value into the proper place in the
+`[project.conf][project_conf_link]` file.
 
 Then build the `dev` vm:
 
@@ -39,5 +40,6 @@ vagrant up dev
 
 [craft_link]: https://buildwithcraft.com/
 [craft_license]: https://buildwithcraft.com/license
+[project_conf_link]: https://github.com/stackstrap/craft-ops/blob/master/private.conf
 [vagrant_link]: http://vagrantup.com
 [virtualbox_link]: http://virtualbox.org
