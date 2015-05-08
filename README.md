@@ -20,7 +20,18 @@ Please also note that use of Craft is subject to their own
 
 ## Getting Started
 
-Clone this repo as the name of your project and then build the `dev` vm:
+Clone this repo as the name of your project.
+
+```
+git clone https://github.com/stackstrap/craft-ops.git project_name
+```
+
+Come up with a `short_name` value for  your project. This is a name that
+will be used for naming things in the system. It should be short and easy to
+type. You will need to enter this value into the proper place in the
+`project.conf` file.
+
+Then build the `dev` vm:
 
 ```
 vagrant up dev
