@@ -3,6 +3,13 @@
 
 require 'yaml'
 
+public
+def deep_merge!(other_hash)
+  merge!(other_hash) do |key, oldval, newval|
+    oldval.class == self.class ? oldval.deep_merge!(newval) : newval
+  end
+end
+
 defaults = YAML::load_file('defaults.conf')
 defaults.deep_merge!(YAML::load_file('project.conf'))
 
@@ -79,7 +86,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       aws.secret_access_key = $project['aws_secret_key']
 
       aws.ami = $project['web']['aws']['ami_id']
-      aws.keypair_name = $project['web']['aws']['keypair_name']
+      aws.keypair_name = $project['short_name']
       aws.region = $project['web']['aws']['region']
       aws.instance_type = $project['web']['aws']['instance_type']
       aws.elastic_ip = $project['web']['aws']['elastic_ip']
@@ -114,9 +121,3 @@ end
 
 $stackstrap_install = "https://raw.githubusercontent.com/stackstrap/install/master/stackstrap.sh"
 
-public
-def deep_merge!(other_hash)
-  merge!(other_hash) do |key, oldval, newval|
-    oldval.class == self.class ? oldval.deep_merge!(newval) : newval
-  end
-end

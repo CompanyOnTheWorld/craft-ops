@@ -338,7 +338,7 @@ def clean():
     with settings(warn_only=True):
         local("git remote rm origin")
 
-    project_yaml['repo'] = None
+    project_yaml['git']['repo'] = None
 
     success, ssh_keys = bb.ssh.all()
 
