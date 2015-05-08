@@ -40,6 +40,6 @@ vagrant up dev
 
 [craft_link]: https://buildwithcraft.com/
 [craft_license]: https://buildwithcraft.com/license
-[project_conf_link]: https://github.com/stackstrap/craft-ops/blob/master/private.conf
+[project_conf_link]: https://github.com/stackstrap/craft-ops/blob/master/project.conf
 [vagrant_link]: http://vagrantup.com
 [virtualbox_link]: http://virtualbox.org
