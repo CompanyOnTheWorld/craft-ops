@@ -11,5 +11,15 @@ the burden of configuration.
 Please also note that use of Craft is subject to their own
 [license agreement][craft_license].
 
+## Getting Started
+
+Just clone this repo as the name of your project and remove
+the `.git` folder if you like. Then you just build the `dev`
+vm:
+
+```
+vagrant up dev
+```
+
 [craft_link]: https://buildwithcraft.com/
 [craft_license]: https://buildwithcraft.com/license
