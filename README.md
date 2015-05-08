@@ -16,7 +16,7 @@ Please also note that use of Craft is subject to their own
 - [Vagrant][vagrant_link]
 - [VirtualBox][virtualbox_link]
 
-> This has not been tested on Windows, support is welcome :)
+> This has not been tested on Windows, but support is welcome :)
 
 ## Getting Started
 
