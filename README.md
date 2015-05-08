@@ -9,7 +9,7 @@ of using FTP and dragging files around and into something a little
 more efficient.  This is important if your business is building sites
 quickly.
 
-To start ops workflows will be built around the use of AWS and Bitbucket.
+To start the ops workflows will be built around the use of AWS and Bitbucket.
 These products both offer free options and can be fully automated. They
 also offer quality products at prices that work for small contractors.
 
