@@ -26,13 +26,15 @@ Clone this repo as the name of your project.
 git clone https://github.com/stackstrap/craft-ops.git project_name
 ```
 
-Come up with a `short_name` value your project. This value will be
-used to label things in the system. It should be short and easy to
-type. Try to leave out special characters or things could fail.
-You will need to enter this value into the proper place in the
-[`project.conf`][project_conf_link] file.
+Come up with "short name" and "project name" values your project. The `short_name`
+value will be used to label things in the system. It should be short and easy to
+type, also leave out special characters or things could fail. The `project_name`
+value will be used to label things that need to be very specific like the name
+of a git repo.
 
-Then build the `dev` vm:
+You will need to enter these values into the [`project.conf`][project_conf_link] file.
+
+Then just build the `dev` vm:
 
 ```
 vagrant up dev
