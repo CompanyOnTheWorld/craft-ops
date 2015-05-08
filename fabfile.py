@@ -301,6 +301,10 @@ def setup():
     if has_git_dir.return_code != "0":
         local("git init")
 
+    has_develop_branch = local("git show-branch --list | grep develop", capture=True)
+    if has_git_dir.return_code != "0":
+        local("git checkout -b develop")
+
     git_remotes = local("git remote", capture=True)
     if "bitbucket" not in git_remotes:
         local("git remote add bitbucket "+repo_url)
@@ -333,6 +337,7 @@ def clean():
 
     with settings(warn_only=True):
         local("git remote rm bitbucket")
+        local("git branch -D develop")
 
     project_yaml['git']['repo'] = None
 
