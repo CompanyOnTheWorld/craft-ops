@@ -123,8 +123,8 @@ def deploy(branch="master"):
         stage = bunchify(stages[current_stage])
         env.user = stage.user
 
-        run("cd $APP_PATH/source && git fetch origin "+branch)
-        run("cd $APP_PATH/source && git archive origin/"+branch+" --prefix=$APP_PATH/releases/"+time+"/ | (cd /; tar xf -)")
+        run("cd $APP_PATH/source && git fetch bitbucket "+branch)
+        run("cd $APP_PATH/source && git archive bitbucket/"+branch+" --prefix=$APP_PATH/releases/"+time+"/ | (cd /; tar xf -)")
 
         run("rm -rf $APP_PATH/current")
 
@@ -300,18 +300,17 @@ def setup():
     with settings(warn_only=True):
         has_git = local("git rev-parse", capture=True)
 
-    git_remotes = local("git remote", capture=True)
-        
     if has_git.return_code != "0":
         local("git init")
+        local("git add .")
+        local("git commit -am 'initial commit'")
 
-    if "origin" in git_remotes:
-        local("git remote rm origin")
+    git_remotes = local("git remote", capture=True)
 
-    local("git remote add origin "+repo_url)
-    local("git add .")
-    local("git commit -am 'initial commit'")
-    local("git push -u origin master")
+    if "bitbucket" not in git_remotes:
+        local("git remote add bitbucket "+repo_url)
+
+    local("git push -u bitbucket master")
 
     #
     # Update YAML
@@ -336,7 +335,7 @@ def clean():
     bb.repository.delete(project['short_name'])
 
     with settings(warn_only=True):
-        local("git remote rm origin")
+        local("git remote rm bitbucket")
 
     project_yaml['git']['repo'] = None
 
