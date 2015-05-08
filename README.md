@@ -20,8 +20,7 @@ Please also note that use of Craft is subject to their own
 
 ## Getting Started
 
-Just clone this repo as the name of your project and remove the `.git` folder
-if you like. Then you just build the `dev` vm:
+Clone this repo as the name of your project and then build the `dev` vm:
 
 ```
 vagrant up dev
