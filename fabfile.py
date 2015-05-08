@@ -236,7 +236,7 @@ def setup():
     # AWS
     #
 
-    local("aws ec2 create-key-pair --key-name web --query 'KeyMaterial' --output text > salt/web/root/files/web.pem")
+    local("aws ec2 create-key-pair --key-name "+project['short_name']+" --query 'KeyMaterial' --output text > salt/web/root/files/web.pem")
     local("chmod 600 salt/web/root/files/web.pem")
     local("ssh-add salt/web/root/files/web.pem")
     local("ssh-keygen -f salt/web/root/files/web.pem -y > salt/web/root/files/web.pub")
@@ -273,7 +273,7 @@ def setup():
     local("aws ec2 associate-route-table --route-table-id "+route_table['RouteTableId']+" --subnet-id "+subnet['SubnetId'])
     local("aws ec2 create-route --route-table-id "+route_table['RouteTableId']+" --destination-cidr-block 0.0.0.0/0 --gateway-id "+internet_gateway['InternetGatewayId'])
 
-    security_group = json.loads(local("aws ec2 create-security-group --vpc-id "+vpc['VpcId']+"  --group-name web --description 'Web server.'", capture=True))
+    security_group = json.loads(local("aws ec2 create-security-group --vpc-id "+vpc['VpcId']+"  --group-name "+project['short_name']+" --description 'Web server.'", capture=True))
     print security_group 
 
     local("aws ec2 authorize-security-group-ingress --group-id "+security_group['GroupId']+" --protocol tcp --port 22 --cidr 0.0.0.0/0")
@@ -353,7 +353,7 @@ def clean():
     local("rm -f salt/dev/root/files/web.pem")
     local("rm -f salt/dev/root/files/web.pub")
     local("cat /dev/null > salt/web/root/files/authorized_keys")
-    local("aws ec2 delete-key-pair --key-name web", capture=True)
+    local("aws ec2 delete-key-pair --key-name "+project['short_name'], capture=True)
 
     if project['web']['aws']['address_allocation_id']:
         local("aws ec2 release-address --allocation-id "+project['web']['aws']['address_allocation_id'], capture=True)
