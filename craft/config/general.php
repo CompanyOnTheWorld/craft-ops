@@ -1,0 +1,42 @@
+<?php
+
+/**
+ * General Configuration
+ *
+ * All of your system's general configuration settings go in here.
+ * You can see a list of the default settings in craft/app/etc/config/defaults/general.php
+ */
+
+$app_path = getenv('APP_PATH');
+
+return array(
+    '*' => array(
+        'devMode' => false,
+        'omitScriptNameInUrls' => true,
+        'defaultTemplateExtensions'=>array('tmpl','html','twig'),
+        'environmentVariables' => array(
+            'basePath' => $app_path . '/public/',
+        ),
+    ),
+    'local' => array(
+        'devMode' => true,
+        'environmentVariables' => array(
+            'baseUrl'  => 'http://localhost:8000/',
+        ),
+    ),
+    'production' => array(
+        'environmentVariables' => array(
+            'baseUrl'  => '',
+        ),
+    ),
+    'staging' => array(
+        'environmentVariables' => array(
+            'baseUrl'  => '',
+        ),
+    ),
+    'preview' => array(
+        'environmentVariables' => array(
+            'baseUrl'  => '',
+        ),
+    ),
+);

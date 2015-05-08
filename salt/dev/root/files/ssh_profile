@@ -1,0 +1,19 @@
+cd {{ app_path }}
+export APP_PATH={{ app_path }}
+source ~/.nvm/nvm.sh
+source ~/virtualenv/bin/activate
+export GIT_EDITOR=vim
+export SASS_LIBSASS_PATH="/usr/local/lib/libsass"
+export CRAFT_ENVIRONMENT=local
+export MYSQL_USER={{ mysql_user }}
+export MYSQL_PASS={{ mysql_pass }}
+export MYSQL_DB={{ mysql_db }}
+export AWS_ACCESS_KEY={{ aws_access_key }}
+export AWS_SECRET_KEY={{ aws_secret_key }}
+export BITBUCKET_USER={{ bitbucket_user }}
+export BITBUCKET_PASS_TOKEN={{ bitbucket_pass_token }}
+export UPLOADS_PATH={{ uploads_path }}
+export CRAFT_PATH={{ craft_path }}
+ssh-add {{ app_path }}/salt/web/root/files/web.pem
+
+source ~/.bashrc

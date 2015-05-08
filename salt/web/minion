@@ -1,0 +1,18 @@
+state_verbose: False
+
+file_client: local
+
+fileserver_backend:
+  - git
+  - roots
+
+gitfs_provider: gitpython
+
+gitfs_remotes:
+  - https://github.com/stackstrap/formula.git:
+    - base: develop
+
+file_roots:
+  base:
+    - /app/salt/web/root
+    - /var/cache/salt/minion/gitfs/refs/base

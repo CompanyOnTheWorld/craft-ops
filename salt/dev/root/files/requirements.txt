@@ -1,0 +1,10 @@
+awscli
+bitbucket-api
+bitbucket-cli
+boto
+bunch
+fabric
+pprintpp
+pyyaml
+requests
+ruamel.yaml

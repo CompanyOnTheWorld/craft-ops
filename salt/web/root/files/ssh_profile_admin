@@ -1,0 +1,12 @@
+cd {{ app_path }}
+source ~/.nvm/nvm.sh
+source ~/virtualenv/bin/activate
+export GIT_EDITOR=vim
+export SASS_LIBSASS_PATH="/usr/local/lib/libsass"
+export AWS_ACCESS_KEY={{ aws_access_key }}
+export AWS_SECRET_KEY={{ aws_secret_key }}
+export BITBUCKET_USER={{ bitbucket_user }}
+export BITBUCKET_PASS_TOKEN={{ bitbucket_pass_token }}
+ssh-add ~/.ssh/web.pem
+
+source ~/.bashrc
