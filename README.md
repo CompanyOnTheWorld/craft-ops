@@ -30,7 +30,7 @@ Come up with a `short_name` value your project. This value will be
 used to label things in the system. It should be short and easy to
 type. Try to leave out special characters or things could fail.
 You will need to enter this value into the proper place in the
-`[project.conf][project_conf_link]` file.
+[`project.conf`][project_conf_link] file.
 
 Then build the `dev` vm:
 
