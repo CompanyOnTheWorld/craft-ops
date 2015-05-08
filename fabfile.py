@@ -320,7 +320,7 @@ def setup():
 
     local("git add .")
     local("git commit -am 'setting up Craft Ops'")
-    local("git push -u bitbucket master")
+    local("git push -u bitbucket develop")
 
 
 @task
