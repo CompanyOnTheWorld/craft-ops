@@ -59,16 +59,18 @@ target/
 # Vagrant
 .vagrant
 
-# Vendor packages
-vendor
-*.pem
-*.pub
-license.key
-
 # Node
 node_modules
 
+# Craft CMS
+craft/plugins/*
+craft/storage/*
+license.key
+
 # Craft Ops
+!.vagrant/web/aws
+vendor
+*.pem
+*.pub
 public/static/*
 salt/web/root/files/authorized_keys
-!.vagrant/web/aws
