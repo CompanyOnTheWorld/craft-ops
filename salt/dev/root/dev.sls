@@ -318,7 +318,7 @@ redacted_font:
 {{ app_user }}_bowerrc:
   file.managed:
     - user: {{ app_user }}
-    - group: {{ group }}
+    - group: {{ app_group }}
     - source: salt://files/.bowerrc
     - name: {{ home }}/.bowerrc
     - template: jinja
@@ -330,7 +330,7 @@ redacted_font:
 {{ app_user }}_git_config:
   file.managed:
     - user: {{ app_user }}
-    - group: {{ group }}
+    - group: {{ app_group }}
     - source: salt://files/git_config
     - name: {{ home }}/.gitconfig
     - template: jinja
@@ -344,7 +344,7 @@ redacted_font:
 {{ app_user }}_ssh_profile:
   file.managed:
     - user: {{ app_user }}
-    - group: {{ group }}
+    - group: {{ app_group }}
     - source: salt://files/ssh_profile
     - name: {{ home }}/.profile
     - template: jinja

@@ -210,7 +210,7 @@ install_composer:
 {{ app_user }}_bowerrc:
   file.managed:
     - user: {{ app_user }}
-    - group: {{ group }}
+    - group: {{ app_group }}
     - source: salt://files/.bowerrc
     - name: {{ home }}/.bowerrc
     - template: jinja
