@@ -156,13 +156,6 @@ install_harp:
     - mode: 755
     - makedirs: True
 
-git-website-prod:
-  git.latest:
-    - name: https://github.com/davist11/craft-guzzle.git
-    - rev: master
-    - target: /usr/share/nginx/prod
-    - user: {{ app_user }}
-
 download_craft_guzzle_plugin:
   archive.extracted:
     - name: {{ app_path }}/vendor
