@@ -135,6 +135,20 @@ install_harp:
              })
 }}
 
+{{ app_path }}/craft/plugins:
+  file.directory:
+    - user: {{ app_user }}
+    - group: {{ app_group }}
+    - mode: 755
+    - makedirs: True
+
+{{ app_path }}/craft/storage:
+  file.directory:
+    - user: {{ app_user }}
+    - group: {{ app_group }}
+    - mode: 755
+    - makedirs: True
+
 {{ app_path }}/vendor:
   file.directory:
     - user: {{ app_user }}
@@ -142,9 +156,26 @@ install_harp:
     - mode: 755
     - makedirs: True
 
+git-website-prod:
+  git.latest:
+    - name: https://github.com/davist11/craft-guzzle.git
+    - rev: master
+    - target: /usr/share/nginx/prod
+    - user: {{ app_user }}
+
+download_craft_guzzle_plugin:
+  archive.extracted:
+    - name: {{ app_path }}/vendor
+    - source: https://github.com/davist11/craft-guzzle/archive/master.tar.gz 
+    - source_hash: md5=8758bcc8e33ba59dacca7c3ead7a31eb
+    - archive_format: tar
+    - user: {{ app_user }}
+    - group: {{ app_group }}
+    - if_missing: {{ app_path }}/vendor/craft-guzzle-master
+
 download_craft:
   archive.extracted:
-    - name: {{ app_path}}/vendor
+    - name: {{ app_path }}/vendor
     - source: https://github.com/pixelandtonic/Craft-Release/archive/master.tar.gz 
     - source_hash: md5=0cf267bac9a021a4adcbf983dfd0f8ef
     - archive_format: tar
