@@ -1,0 +1,3 @@
+{
+  "directory": "{{ app_path }}/shared/vendor"
+}

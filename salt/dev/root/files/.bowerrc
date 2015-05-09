@@ -1,0 +1,3 @@
+{
+  "directory": "{{ app_path }}/vendor"
+}
