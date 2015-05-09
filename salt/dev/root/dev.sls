@@ -315,8 +315,36 @@ redacted_font:
     - user: {{ app_user }}
     - group: {{ app_group }}
 
+{{ app_user }}_bowerrc:
+  file.managed:
+    - user: {{ app_user }}
+    - group: {{ group }}
+    - source: salt://files/.bowerrc
+    - name: {{ home }}/.bowerrc
+    - template: jinja
+    - require:
+      - user: {{ app_user }}
+    - defaults:
+      app_path: {{ app_path }}
+
+{{ app_user }}_git_config:
+  file.managed:
+    - user: {{ app_user }}
+    - group: {{ group }}
+    - source: salt://files/git_config
+    - name: {{ home }}/.gitconfig
+    - template: jinja
+    - require:
+      - user: {{ app_user }}
+    - defaults:
+      home: {{ home }}
+      git_email: {{ git_email }}
+      git_name: {{ git_name }}
+
 {{ app_user }}_ssh_profile:
   file.managed:
+    - user: {{ app_user }}
+    - group: {{ group }}
     - source: salt://files/ssh_profile
     - name: {{ home }}/.profile
     - template: jinja
@@ -333,17 +361,5 @@ redacted_font:
       bitbucket_pass_token: {{ bitbucket_pass_token }}
       uploads_path: {{ uploads_path }}
       craft_path: {{ craft_path }}
-
-{{ app_user }}_git_config:
-  file.managed:
-    - source: salt://files/git_config
-    - name: {{ home }}/.gitconfig
-    - template: jinja
-    - require:
-      - user: {{ app_user }}
-    - defaults:
-      home: {{ home }}
-      git_email: {{ git_email }}
-      git_name: {{ git_name }}
 
 # vim: set ft=yaml ts=2 sw=2 sts=2 et ai :

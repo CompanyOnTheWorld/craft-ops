@@ -207,6 +207,18 @@ install_composer:
     - user: {{ app_user }}
     - group: {{ app_group }}
 
+{{ app_user }}_bowerrc:
+  file.managed:
+    - user: {{ app_user }}
+    - group: {{ group }}
+    - source: salt://files/.bowerrc
+    - name: {{ home }}/.bowerrc
+    - template: jinja
+    - require:
+      - user: {{ app_user }}
+    - defaults:
+      app_path: {{ app_path }}
+
 {{ app_user }}_profile_setup:
   file.managed:
     - source: salt://files/ssh_profile
