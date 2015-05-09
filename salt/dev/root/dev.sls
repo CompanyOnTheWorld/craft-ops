@@ -166,6 +166,12 @@ download_craft_guzzle_plugin:
     - group: {{ app_group }}
     - if_missing: {{ app_path }}/vendor/craft-guzzle-master
 
+{{ app_path }}/craft/plugins/guzzle:
+  file.symlink:
+    - user: {{ app_user }}
+    - group: {{ app_group }}
+    - target: {{ app_path }}/vendor/craft-guzzle-master/guzzle
+
 download_craft:
   archive.extracted:
     - name: {{ app_path }}/vendor
