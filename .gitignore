@@ -71,3 +71,4 @@ node_modules
 # Craft Ops
 public/static/*
 salt/web/root/files/authorized_keys
+!.vagrant/web/aws
