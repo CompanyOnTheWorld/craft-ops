@@ -55,7 +55,6 @@ install_composer:
 
 {% for stage in stages %}
 
-{% set server_name = stages[stage]['server_name'] -%}
 {% set app_user = stages[stage]['user'] -%}
 {% set app_group = stages[stage]['group'] -%}
 
@@ -72,9 +71,6 @@ install_composer:
 
 {% set uploads_path = app_path + "/shared/assets" -%}
 {% set craft_path = app_path + "/shared/vendor/Craft-Release-master" -%}
-
-{% set web_server_name = project['web']['server_name'] if (stage == "production") else stage+'.'+project['web']['server_name'] -%}
-{% set server_name = server_name + " " + web_server_name %}
 
 {{ skeleton(app_user, uid, gid, remove_groups=False) }}
 
@@ -110,6 +106,19 @@ install_composer:
 }}
 
 {{ mysql_user_db(mysql_user, mysql_pass, mysql_db) }}
+
+{% if project['web']['server_name'] is not none  %}
+  {% set web_server_name = project['web']['server_name'] if (stage == "production") else stage+'.'+project['web']['server_name'] -%}
+
+  {% if stages[stage]['server_name'] is not none %}
+    {% set server_name = stages[stage]['server_name'] + " " + web_server_name %}
+  {% else %}
+    {% set server_name = web_server_name %}
+  {% endif %}
+
+{% else %}
+  {% set server_name = short_name -%}
+{% endif %}
 
 {{ nginxsite(short_name, app_user, app_group,
              server_name=server_name,
@@ -163,7 +172,6 @@ install_composer:
     - name: {{ app_repo }}
     - identity: {{ home }}/.ssh/web.pem
     - user: {{ app_user }}
-    - rev: master
     - target: {{ app_path }}/source
 
 {{ app_user }}_download_craft:
