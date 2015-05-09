@@ -56,9 +56,6 @@ docs/_build/
 # PyBuilder
 target/
 
-# Vagrant
-.vagrant
-
 # Node
 node_modules
 
@@ -68,7 +65,7 @@ craft/storage/*
 license.key
 
 # Craft Ops
-!.vagrant/web/aws
+.vagrant/machines/dev
 vendor
 *.pem
 *.pub
