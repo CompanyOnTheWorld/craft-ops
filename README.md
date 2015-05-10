@@ -4,7 +4,8 @@
 DevOps environment which is tailored for [Craft CMS][craft_link]. Craft itself
 is already incredibly easy to setup with tools like MAMP, and this project
 aims to stay that way. This project's aim is to get you past the process
-of dragging files over to FTP and working with efficiency in mind.
+of dragging files over to FTP and working with efficiency in mind, while also
+learning a thing or two about Linux.
 
 To start, the ops workflows will be built around the use of AWS and Bitbucket.
 These products both offer free options and can be fully automated.
