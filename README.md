@@ -1,13 +1,11 @@
 # Craft Ops
 
-`Craft Ops` is a template which uses common sense and automation 
-configurations to build a DevOps environment tailored for
-[Craft CMS][craft_link]. Craft itself is already incredibly easy to
-setup if you use tools like MAMP, and this project aims to ensure
-things stay that way. This project aims to get you past the process
+`Craft Ops` is a template which uses automation and to build you a
+DevOps environment tailored for [Craft CMS][craft_link]. Craft itself
+is already incredibly easy to setup with tools like MAMP, and this project
+aims to stay that way. This aim is to get you past the process
 of using FTP and dragging files around and into something a little
-more efficient.  This is important if your business is building sites
-quickly.
+more efficient without the headache of configuration.
 
 To start, the ops workflows will be built around the use of AWS and Bitbucket.
 These products both offer free options and can be fully automated. They
