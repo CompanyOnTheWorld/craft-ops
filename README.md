@@ -7,8 +7,7 @@ aims to stay that way. This aim is to get you past the process
 of dragging files over to FTP and working with efficiency in mind.
 
 To start, the ops workflows will be built around the use of AWS and Bitbucket.
-These products both offer free options and can be fully automated. They
-also offer quality prices that work for small contractors.
+These products both offer free options and can be fully automated.
 
 Please also note that use of Craft is subject to their own
 [license agreement][craft_license].
