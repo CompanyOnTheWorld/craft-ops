@@ -58,8 +58,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
     dev.vm.network "forwarded_port", guest: 8000, host: 8000
 
-    dev.vm.synced_folder ".", "/app"
-    dev.vm.synced_folder ".", "/home/vagrant/apps/"+$project['short_name']
+    dev.vm.synced_folder ".", "/project"
 
     if File.exist?(ENV['HOME']+'/ops.conf')
       dev.vm.provision :file, source: '~/ops.conf', destination: $project['dev']['ops_conf_path']
@@ -77,7 +76,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   end
 
   config.vm.define "web" do |web|
-    web.vm.synced_folder ".", "/app", type: "rsync"
+    web.vm.synced_folder ".", "/project", type: "rsync"
+
     web.vm.box = $project['web']['vagrant']['box']
     web.vm.box_url = $project['web']['vagrant']['box_url']
 
