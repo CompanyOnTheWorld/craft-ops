@@ -93,7 +93,7 @@ include:
 
 {{ nvmnode(project_name, user, group,
            ignore_package_json=True,
-           node_globals=['bower', 'grunt', 'node-sass', 'harp']) 
+           node_globals=['bower', 'harp']) 
 }}
   
 {{ php5_fpm_instance(project_name, '5000', user, group,
