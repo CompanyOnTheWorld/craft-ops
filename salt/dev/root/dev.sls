@@ -95,17 +95,6 @@ include:
            ignore_package_json=True,
            node_globals=['bower', 'grunt', 'node-sass', 'harp']) 
 }}
-
-install_harp:
-  cmd.run:
-    - name: /bin/bash -c "source ~/.nvm/nvm.sh; npm install -g harp"
-    - user: {{ user }}
-    - unless: /bin/bash -c "source ~/.nvm/nvm.sh; npm -g ls harp | grep harp"
-    - check_cmd:
-      - /bin/true
-    - require:
-      - cmd: vagrant_install_node
-
   
 {{ php5_fpm_instance(project_name, '5000', user, group,
                      envs={
