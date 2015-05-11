@@ -86,7 +86,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       aws.secret_access_key = $project['aws_secret_key']
 
       aws.ami = $project['web']['aws']['ami_id']
-      aws.keypair_name = $project['short_name']
+      aws.keypair_name = $project['name']
       aws.region = $project['web']['aws']['region']
       aws.instance_type = $project['web']['aws']['instance_type']
       aws.elastic_ip = $project['web']['aws']['elastic_ip']

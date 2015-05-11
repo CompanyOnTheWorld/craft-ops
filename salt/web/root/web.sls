@@ -46,7 +46,7 @@ install_composer:
 {% from "stackstrap/nvmnode/macros.sls" import nvmnode %}
 
 {% set project = pillar -%}
-{% set short_name = project['short_name'] %}
+{% set project_name = project['name'] %}
 
 {% set stages = project['web']['stages'] %}
 
@@ -75,14 +75,14 @@ install_composer:
 {% set uploads_path = deploy_path + "/shared/assets" -%}
 {% set craft_path = deploy_path + "/shared/vendor/Craft-Release-master" -%}
 
-{{ env(short_name, user, group, uid=uid, gid=gid) }}
+{{ env(project_name, user, group, uid=uid, gid=gid) }}
 
-{{ deploy(short_name, user, group,
+{{ deploy(project_name, user, group,
           repo=repo,
           identity=home+'/.ssh/web.pem')
 }}
 
-{{ nvmnode(short_name, user, group,
+{{ nvmnode(project_name, user, group,
            ignore_package_json=True,
            node_globals=['bower', 'grunt', 'node-sass', 'harp']) 
 }}
@@ -97,7 +97,7 @@ install_composer:
     - require:
       - cmd: {{ user }}_install_node
 
-{{ php5_fpm_instance(short_name+"_"+stage, port, user, group,
+{{ php5_fpm_instance(project_name+"_"+stage, port, user, group,
                      envs={
                       'PROJECT_PATH': project_path,
                       'DEPLOY_PATH': deploy_path,
@@ -122,10 +122,10 @@ install_composer:
   {% endif %}
 
 {% else %}
-  {% set server_name = short_name -%}
+  {% set server_name = project_name -%}
 {% endif %}
 
-{{ nginxsite(short_name, user, group,
+{{ nginxsite(project_name, user, group,
              server_name=server_name,
              template="salt://files/craft-cms.conf",
              create_root=False,

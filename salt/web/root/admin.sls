@@ -9,7 +9,7 @@ include:
 {% from "stackstrap/nvmnode/macros.sls" import nvmnode %}
 
 {% set project = pillar -%}
-{% set short_name = project['short_name'] -%}
+{% set project_name = project['name'] -%}
 
 {% set user = 'ubuntu' -%}
 {% set group = 'ubuntu' -%}
@@ -23,9 +23,9 @@ include:
 {% set bitbucket_user = project['bitbucket_user'] -%}
 {% set bitbucket_pass_token = project['bitbucket_pass_token'] -%}
 
-{{ stackstrap_env(short_name, user, group) }}
+{{ stackstrap_env(project_name, user, group) }}
 
-{{ nvmnode(short_name, user, group,
+{{ nvmnode(project_name, user, group,
            ignore_package_json=True,
            node_globals=['bower', 'grunt', 'node-sass', 'harp']) 
 }}
@@ -55,7 +55,7 @@ admin_requirements:
     - name: "source {{ virtualenv }}/bin/activate; pip install -r {{ project_path }}/salt/web/root/files/requirements.txt"
     - shell: /bin/bash
     - env:
-        SHORT_NAME: {{ short_name }}
+        SHORT_NAME: {{ project_name }}
     - user: {{ user }}
     - require:
       - cmd: admin_virtualenv

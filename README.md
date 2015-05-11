@@ -22,15 +22,15 @@ Please also note that use of Craft is subject to their own
 
 ## Getting Started
 
-Clone this repo as the name of your project.
+Clone this repo as the `name` of your project.
 
 ```
-git clone https://github.com/stackstrap/craft-ops.git project_name
+git clone https://github.com/stackstrap/craft-ops.git name
 ```
 
-You will need to enter same `project_name` into [`project.conf`][project_conf_link].
+Then enter the same `name` value into [`project.conf`][project_conf_link].
 
-> Keep your `project_name` short and without special characters.
+> Keep your `name` short and without special characters.
 
 **Then just build the `dev` vm:**
 
@@ -40,6 +40,6 @@ vagrant up dev
 
 [craft_link]: https://buildwithcraft.com/
 [craft_license]: https://buildwithcraft.com/license
-[project_conf_link]: https://github.com/stackstrap/craft-ops/blob/master/project.conf
+[project_conf_link]: https://github.com/stackstrap/craft-ops/blob/master/project.conf#L3
 [vagrant_link]: http://vagrantup.com
 [virtualbox_link]: http://virtualbox.org
