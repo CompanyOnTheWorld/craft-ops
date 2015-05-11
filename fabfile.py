@@ -236,7 +236,7 @@ def setup():
     # AWS
     #
 
-    local("aws ec2 create-key-pair --key-name "+project['project_name']+" --query 'KeyMaterial' --output text > salt/web/root/files/web.pem")
+    local("aws ec2 create-key-pair --key-name "+project['name']+" --query 'KeyMaterial' --output text > salt/web/root/files/web.pem")
     local("chmod 600 salt/web/root/files/web.pem")
     local("ssh-add salt/web/root/files/web.pem")
     local("ssh-keygen -f salt/web/root/files/web.pem -y > salt/web/root/files/web.pub")
@@ -273,7 +273,7 @@ def setup():
     local("aws ec2 associate-route-table --route-table-id "+route_table['RouteTableId']+" --subnet-id "+subnet['SubnetId'])
     local("aws ec2 create-route --route-table-id "+route_table['RouteTableId']+" --destination-cidr-block 0.0.0.0/0 --gateway-id "+internet_gateway['InternetGatewayId'])
 
-    security_group = json.loads(local("aws ec2 create-security-group --vpc-id "+vpc['VpcId']+"  --group-name "+project['project_name']+" --description 'Web server.'", capture=True))
+    security_group = json.loads(local("aws ec2 create-security-group --vpc-id "+vpc['VpcId']+"  --group-name "+project['name']+" --description 'Web server.'", capture=True))
     print security_group 
 
     local("aws ec2 authorize-security-group-ingress --group-id "+security_group['GroupId']+" --protocol tcp --port 22 --cidr 0.0.0.0/0")
@@ -287,14 +287,14 @@ def setup():
     #
 
     bb = Bitbucket(project['bitbucket_user'], project['bitbucket_pass_token'])
-    success, result = bb.repository.create(project['project_name'])
-    repo_url = "git@bitbucket.org:"+project['bitbucket_user']+"/"+project['project_name']+".git"
+    success, result = bb.repository.create(project['name'])
+    repo_url = "git@bitbucket.org:"+project['bitbucket_user']+"/"+project['name']+".git"
 
     project_yaml['git']['repo'] = repo_url
     pprint.pprint(result)
 
     public_key = local("ssh-keygen -f salt/web/root/files/web.pem -y", capture=True)
-    success, result = bb.ssh.create(public_key, project['project_name'])
+    success, result = bb.ssh.create(public_key, project['name'])
     pprint.pprint(result)
 
     with settings(warn_only=True):
@@ -335,7 +335,7 @@ def clean():
 
     bb = Bitbucket(project['bitbucket_user'], project['bitbucket_pass_token'])
 
-    bb.repository.delete(project['project_name'])
+    bb.repository.delete(project['name'])
 
     with settings(warn_only=True):
         local("git remote rm bitbucket")
@@ -346,7 +346,7 @@ def clean():
     success, ssh_keys = bb.ssh.all()
 
     for key in ssh_keys:
-        if key['label'] == project['project_name']:
+        if key['label'] == project['name']:
             pprint.pprint(key)
             bb.ssh.delete(key['pk'])
 
@@ -359,7 +359,7 @@ def clean():
     local("rm -f salt/dev/root/files/web.pem")
     local("rm -f salt/dev/root/files/web.pub")
     local("cat /dev/null > salt/web/root/files/authorized_keys")
-    local("aws ec2 delete-key-pair --key-name "+project['project_name'], capture=True)
+    local("aws ec2 delete-key-pair --key-name "+project['name'], capture=True)
 
     if project['web']['aws']['address_allocation_id']:
         local("aws ec2 release-address --allocation-id "+project['web']['aws']['address_allocation_id'], capture=True)
