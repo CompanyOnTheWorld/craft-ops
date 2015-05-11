@@ -7,7 +7,7 @@
  * You can see a list of the default settings in craft/app/etc/config/defaults/general.php
  */
 
-$app_path = getenv('APP_PATH');
+$project_path = getenv('PROJECT_PATH');
 
 return array(
     '*' => array(
@@ -15,7 +15,7 @@ return array(
         'omitScriptNameInUrls' => true,
         'defaultTemplateExtensions'=>array('tmpl','html','twig'),
         'environmentVariables' => array(
-            'basePath' => $app_path . '/public/',
+            'basePath' => $project_path . '/public/',
         ),
     ),
     'local' => array(

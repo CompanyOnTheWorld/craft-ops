@@ -14,5 +14,5 @@ gitfs_remotes:
 
 file_roots:
   base:
-    - /app/salt/dev/root
+    - /project/salt/dev/root
     - /var/cache/salt/minion/gitfs/refs/base

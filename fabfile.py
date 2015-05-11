@@ -123,30 +123,30 @@ def deploy(branch="master"):
         stage = bunchify(stages[current_stage])
         env.user = stage.user
 
-        run("cd $APP_PATH/source && git fetch bitbucket "+branch)
-        run("cd $APP_PATH/source && git archive bitbucket/"+branch+" --prefix=$APP_PATH/releases/"+time+"/ | (cd /; tar xf -)")
+        run("cd $DEPLOY_PATH/source && git fetch bitbucket "+branch)
+        run("cd $DEPLOY_PATH/source && git archive bitbucket/"+branch+" --prefix=$DEPLOY_PATH/releases/"+time+"/ | (cd /; tar xf -)")
 
-        run("rm -rf $APP_PATH/current")
+        run("rm -rf $DEPLOY_PATH/current")
 
-        run("ln -s $APP_PATH/releases/"+time+" $APP_PATH/current")
+        run("ln -s $DEPLOY_PATH/releases/"+time+" $DEPLOY_PATH/current")
 
-        run("ln -s $APP_PATH/shared/vendor $APP_PATH/current/vendor")
-        run("ln -s $APP_PATH/shared/assets $APP_PATH/current/public/assets")
-        run("ln -s $APP_PATH/shared/static $APP_PATH/current/public/static")
+        run("ln -s $DEPLOY_PATH/shared/vendor $DEPLOY_PATH/current/vendor")
+        run("ln -s $DEPLOY_PATH/shared/assets $DEPLOY_PATH/current/public/assets")
+        run("ln -s $DEPLOY_PATH/shared/static $DEPLOY_PATH/current/public/static")
 
         run("rm -rf $CRAFT_PATH/config")
-        run("ln -s $APP_PATH/current/craft/config $CRAFT_PATH/config")
+        run("ln -s $DEPLOY_PATH/current/craft/config $CRAFT_PATH/config")
 
         run("rm -rf $CRAFT_PATH/plugins")
-        run("ln -s $APP_PATH/current/craft/plugins $CRAFT_PATH/plugins")
+        run("ln -s $DEPLOY_PATH/current/craft/plugins $CRAFT_PATH/plugins")
 
         run("rm -rf $CRAFT_PATH/templates")
-        run("ln -s $APP_PATH/current/templates $CRAFT_PATH/templates")
+        run("ln -s $DEPLOY_PATH/current/templates $CRAFT_PATH/templates")
 
         run("rm -rf $CRAFT_PATH/storage")
-        run("ln -s $APP_PATH/shared/storage $CRAFT_PATH/storage")
+        run("ln -s $DEPLOY_PATH/shared/storage $CRAFT_PATH/storage")
 
-        run("harp compile $APP_PATH/current/assets $APP_PATH/shared/static")
+        run("harp compile $DEPLOY_PATH/current/assets $DEPLOY_PATH/shared/static")
 
 
 @task
@@ -187,22 +187,22 @@ def db(method):
 
         if method == "import":
             if env.host == "localhost":
-                local("cd $APP_PATH/tmp && mysql -u "+os.environ['MYSQL_USER']+" -h "+os.environ['MYSQL_HOST']+" -p"+os.environ['MYSQL_PASS']+" "+os.environ['MYSQL_DB']+" < dump.sql")
+                local("cd /tmp && mysql -u $MYSQL_USER -h $MYSQL_HOST -p$MYSQL_PASS $MYSQL_DB < dump.sql")
             else:
-                run("cd $APP_PATH/tmp && mysql -u $MYSQL_USER -h $MYSQL_HOST -p$MYSQL_PASS $MYSQL_DB < import.sql")
+                run("cd $DEPLOY_PATH/tmp && mysql -u $MYSQL_USER -h $MYSQL_HOST -p$MYSQL_PASS $MYSQL_DB < import.sql")
         if method == "dump":
             if env.host == "localhost":
-                local("cd $APP_PATH/tmp && mysqldump -u $MYSQL_USER -h $MYSQL_HOST -p$MYSQL_PASS $MYSQL_DB > dump.sql")
+                local("cd /tmp && mysqldump -u $MYSQL_USER -h $MYSQL_HOST -p$MYSQL_PASS $MYSQL_DB > dump.sql")
             else:
-                run("cd $APP_PATH/tmp && mysqldump -u $MYSQL_USER -h $MYSQL_HOST -p$MYSQL_PASS $MYSQL_DB > dump.sql")
+                run("cd $DEPLOY_PATH/tmp && mysqldump -u $MYSQL_USER -h $MYSQL_HOST -p$MYSQL_PASS $MYSQL_DB > dump.sql")
         if method == "down":
-            get("$APP_PATH/tmp/dump.sql","/tmp/dump.sql")
+            get("$DEPLOY_PATH/tmp/dump.sql","/tmp/dump.sql")
         if method == "up":
-            put("/tmp/dump.sql","$APP_PATH/tmp/import.sql")
+            put("/tmp/dump.sql","$DEPLOY_PATH/tmp/import.sql")
         if method == "sync":
-            run("cd $APP_PATH/tmp && mysqldump -u $MYSQL_USER -h $MYSQL_HOST -p$MYSQL_PASS $MYSQL_DB > dump.sql")
-            get("$APP_PATH/tmp/dump.sql","/tmp/dump.sql")
-            local("cd /tmp && mysql -u "+os.environ['MYSQL_USER']+" -h "+os.environ['MYSQL_HOST']+" -p"+os.environ['MYSQL_PASS']+" "+os.environ['MYSQL_DB']+" < dump.sql")
+            run("cd $DEPLOY_PATH/tmp && mysqldump -u $MYSQL_USER -h $MYSQL_HOST -p$MYSQL_PASS $MYSQL_DB > dump.sql")
+            get("$DEPLOY_PATH/tmp/dump.sql","/tmp/dump.sql")
+            local("cd /tmp && mysql -u $MYSQL_USER -h $MYSQL_HOST -p$MYSQL_PASS $MYSQL_DB < dump.sql")
             
 
 
@@ -214,7 +214,7 @@ def releases(method="clean"):
             stage = bunchify(stages[current_stage])
             env.user = stage.user
 
-            output = run("ls $APP_PATH/releases")
+            output = run("ls $DEPLOY_PATH/releases")
             releases = sorted(output.split(), reverse=True)
             keep = 3
 
@@ -222,7 +222,7 @@ def releases(method="clean"):
                 if keep <= index:
                     print "removing =>"
                     print release
-                    run("rm -rf $APP_PATH/releases/"+release)
+                    run("rm -rf $DEPLOY_PATH/releases/"+release)
                 else:
                     print "keeping =>"
                     print release

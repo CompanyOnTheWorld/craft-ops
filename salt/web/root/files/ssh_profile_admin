@@ -1,4 +1,4 @@
-cd {{ app_path }}
+cd {{ project_path }}
 source ~/.nvm/nvm.sh
 source ~/virtualenv/bin/activate
 export GIT_EDITOR=vim

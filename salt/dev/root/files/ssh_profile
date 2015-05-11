@@ -1,5 +1,5 @@
-cd {{ app_path }}
-export APP_PATH={{ app_path }}
+cd {{ project_path }}
+export PROJECT_PATH={{ project_path }}
 source ~/.nvm/nvm.sh
 source ~/virtualenv/bin/activate
 export GIT_EDITOR=vim
@@ -14,6 +14,6 @@ export BITBUCKET_USER={{ bitbucket_user }}
 export BITBUCKET_PASS_TOKEN={{ bitbucket_pass_token }}
 export UPLOADS_PATH={{ uploads_path }}
 export CRAFT_PATH={{ craft_path }}
-ssh-add {{ app_path }}/salt/web/root/files/web.pem
+ssh-add {{ project_path }}/salt/web/root/files/web.pem
 
 source ~/.bashrc

@@ -17,7 +17,7 @@ include:
 {% from "stackstrap/nginx/macros.sls" import nginxsite %}
 {% from "stackstrap/php5/macros.sls" import php5_fpm_instance %}
 {% from "stackstrap/mysql/macros.sls" import mysql_user_db %}
-{% from "stackstrap/env/macros.sls" import stackstrap_env %}
+{% from "stackstrap/env/macros.sls" import env %}
 {% from "stackstrap/rvmruby/macros.sls" import rvmruby %}
 {% from "stackstrap/nvmnode/macros.sls" import nvmnode %}
 
@@ -29,11 +29,11 @@ include:
 {% set bitbucket_user = project['bitbucket_user'] -%}
 {% set bitbucket_pass_token = project['bitbucket_pass_token'] -%}
 
-{% set app_user = project['dev']['user'] -%}
-{% set app_group = project['dev']['group'] -%}
-{% set home = "/home/" + app_user -%}
+{% set user = project['dev']['user'] -%}
+{% set group = project['dev']['group'] -%}
+{% set home = "/home/" + user -%}
 {% set virtualenv = home + "/virtualenv" -%}
-{% set app_path = home + "/apps/" + short_name -%}
+{% set project_path = "/project" -%}
 
 {% set git_repo = project['git']['repo'] %}
 {% set git_email = project['git']['email'] %}
@@ -45,30 +45,28 @@ include:
 
 {{ mysql_user_db(mysql_user, mysql_pass) }}
 
-{% set uploads_path = app_path + "/public/assets" -%}
-{% set craft_path = app_path + "/vendor/Craft-Release-master" -%}
+{% set uploads_path = project_path + "/public/assets" -%}
+{% set craft_path = project_path + "/vendor/Craft-Release-master" -%}
 
-{{ app_user }}_mysql_import:
+{{ user }}_mysql_import:
   cmd.run:
-    - name: unzip -p {{ app_path }}/salt/dev/root/files/craft-cms-backup.zip | mysql -u {{ mysql_user }} -p{{ mysql_pass }} {{ mysql_user }}
+    - name: unzip -p {{ project_path }}/salt/dev/root/files/craft-cms-backup.zip | mysql -u {{ mysql_user }} -p{{ mysql_pass }} {{ mysql_user }}
 
-{{ skeleton(app_user, 1000, 1000, remove_groups=False) }}
+{{ env(short_name, user, group) }}
 
-{{ stackstrap_env(short_name, app_user, app_group) }}
-
-{{ app_user }}_ssh_config:
+{{ user }}_ssh_config:
   file.managed:
     - name: {{ home }}/.ssh/config
     - source: salt://files/ssh_config
     - template: jinja
     - makedirs: True
-    - user: {{ app_user }}
+    - user: {{ user }}
 
-{{ app_user }}_ssh_known_hosts:
+{{ user }}_ssh_known_hosts:
   ssh_known_hosts:
     - name: bitbucket.org
     - present
-    - user: {{ app_user }}
+    - user: {{ user }}
 
 {{ short_name }}_virtualenv:
   cmd:
@@ -82,7 +80,7 @@ include:
 {{ short_name }}_requirements:
   cmd:
     - run
-    - name: "source {{ virtualenv }}/bin/activate; pip install -r {{ app_path }}/salt/dev/root/files/requirements.txt"
+    - name: "source {{ virtualenv }}/bin/activate; pip install -r {{ project_path }}/salt/dev/root/files/requirements.txt"
     - shell: /bin/bash
     - env:
         SHORT_NAME: {{ short_name }}
@@ -90,11 +88,11 @@ include:
     - require:
       - cmd: {{ short_name }}_virtualenv
 
-{{ rvmruby(short_name, app_user, app_group,
+{{ rvmruby(short_name, user, group,
            rvm_globals=['filewatcher']) 
 }}
 
-{{ nvmnode(short_name, app_user, app_group,
+{{ nvmnode(short_name, user, group,
            ignore_package_json=True,
            node_globals=['bower', 'grunt', 'node-sass', 'harp']) 
 }}
@@ -102,7 +100,7 @@ include:
 install_harp:
   cmd.run:
     - name: /bin/bash -c "source ~/.nvm/nvm.sh; npm install -g harp"
-    - user: {{ app_user }}
+    - user: {{ user }}
     - unless: /bin/bash -c "source ~/.nvm/nvm.sh; npm -g ls harp | grep harp"
     - check_cmd:
       - /bin/true
@@ -110,11 +108,11 @@ install_harp:
       - cmd: vagrant_install_node
 
   
-{{ php5_fpm_instance(short_name, '5000', app_user, app_group,
+{{ php5_fpm_instance(short_name, '5000', user, group,
                      envs={
                        'CRAFT_ENVIRONMENT': 'local',
                        'CRAFT_PATH': craft_path,
-                       'APP_PATH': app_path,
+                       'PROJECT_PATH': project_path,
                        'UPLOADS_PATH': uploads_path,
 			                 'MYSQL_USER': mysql_user,
 			                 'MYSQL_PASS': mysql_pass,
@@ -122,70 +120,70 @@ install_harp:
 		                 })
 }}
 
-{{ nginxsite(short_name, app_user, app_group,
+{{ nginxsite(short_name, user, group,
              template="salt://files/craft-cms.conf",
 	           create_root=False,
 	           root="public",
              listen="8000",
              server_name="_",
-             static=app_path+"/public/static",
+             static=project_path+"/public/static",
              cors="*",
              defaults={
                 'port': '5000'
              })
 }}
 
-{{ app_path }}/craft/plugins:
+{{ project_path }}/craft/plugins:
   file.directory:
-    - user: {{ app_user }}
-    - group: {{ app_group }}
+    - user: {{ user }}
+    - group: {{ group }}
     - mode: 755
     - makedirs: True
 
-{{ app_path }}/craft/storage:
+{{ project_path }}/craft/storage:
   file.directory:
-    - user: {{ app_user }}
-    - group: {{ app_group }}
+    - user: {{ user }}
+    - group: {{ group }}
     - mode: 755
     - makedirs: True
 
-{{ app_path }}/vendor:
+{{ project_path }}/vendor:
   file.directory:
-    - user: {{ app_user }}
-    - group: {{ app_group }}
+    - user: {{ user }}
+    - group: {{ group }}
     - mode: 755
     - makedirs: True
 
 download_craft_guzzle_plugin:
   archive.extracted:
-    - name: {{ app_path }}/vendor
+    - name: {{ project_path }}/vendor
     - source: https://github.com/davist11/craft-guzzle/archive/master.tar.gz 
     - source_hash: md5=8758bcc8e33ba59dacca7c3ead7a31eb
     - archive_format: tar
-    - user: {{ app_user }}
-    - group: {{ app_group }}
-    - if_missing: {{ app_path }}/vendor/craft-guzzle-master
+    - user: {{ user }}
+    - group: {{ group }}
+    - if_missing: {{ project_path }}/vendor/craft-guzzle-master
 
-{{ app_path }}/craft/plugins/guzzle:
+{{ project_path }}/craft/plugins/guzzle:
   file.symlink:
-    - user: {{ app_user }}
-    - group: {{ app_group }}
-    - target: {{ app_path }}/vendor/craft-guzzle-master/guzzle
+    - user: {{ user }}
+    - group: {{ group }}
+    - target: {{ project_path }}/vendor/craft-guzzle-master/guzzle
 
 download_craft:
   archive.extracted:
-    - name: {{ app_path }}/vendor
+    - name: {{ project_path }}/vendor
     - source: https://github.com/pixelandtonic/Craft-Release/archive/master.tar.gz 
     - source_hash: md5=0cf267bac9a021a4adcbf983dfd0f8ef
     - archive_format: tar
-    - user: {{ app_user }}
-    - group: {{ app_group }}
+    - user: {{ user }}
+    - group: {{ group }}
     - if_missing: {{ craft_path }}
 
 {{ craft_path }}:
   file.directory:
-    - user: {{ app_user }}
-    - group: {{ app_group }}
+    - user: {{ user }}
+    - group: {{ group }}
     - makedirs: True
     - recurse:
       - user
@@ -193,27 +191,27 @@ download_craft:
 
 {{ craft_path }}/config:
   file.symlink:
-    - user: {{ app_user }}
-    - group: {{ app_group }}
-    - target: {{ app_path }}/craft/config
+    - user: {{ user }}
+    - group: {{ group }}
+    - target: {{ project_path }}/craft/config
 
 {{ craft_path }}/plugins:
   file.symlink:
-    - user: {{ app_user }}
-    - group: {{ app_group }}
-    - target: {{ app_path }}/craft/plugins
+    - user: {{ user }}
+    - group: {{ group }}
+    - target: {{ project_path }}/craft/plugins
 
 {{ craft_path }}/storage:
   file.symlink:
-    - user: {{ app_user }}
-    - group: {{ app_group }}
-    - target: {{ app_path }}/craft/storage
+    - user: {{ user }}
+    - group: {{ group }}
+    - target: {{ project_path }}/craft/storage
 
 {{ craft_path }}/templates:
   file.symlink:
-    - user: {{ app_user }}
-    - group: {{ app_group }}
-    - target: {{ app_path }}/templates
+    - user: {{ user }}
+    - group: {{ group }}
+    - target: {{ project_path }}/templates
 
 remove-nginx-default-conf:
   file:
@@ -230,7 +228,7 @@ install_composer:
   cmd:
     - run
     - name: curl -sS https://getcomposer.org/installer | php
-    - user: {{ app_user }}
+    - user: {{ user }}
     - unless: test -e {{ home }}/composer.phar
     - require:
       - pkg: php5-fpm
@@ -256,16 +254,16 @@ php5-restart:
 
 {{ home }}/.aws:
   file.directory:
-    - user: {{ app_user }}
-    - group: {{ app_group }}
+    - user: {{ user }}
+    - group: {{ group }}
     - mode: 755 
 
 {{ home }}/.aws/config:
   file.managed:
     - source: salt://files/aws.config
     - template: jinja
-    - user: {{ app_user }}
-    - group: {{ app_group }}
+    - user: {{ user }}
+    - group: {{ group }}
     - mode: 600
     - defaults:
         aws_access_key: {{ aws_access_key }} 
@@ -276,8 +274,8 @@ php5-restart:
   file.managed:
     - source: salt://files/bitbucket.conf
     - template: jinja
-    - user: {{ app_user }}
-    - group: {{ app_group }}
+    - user: {{ user }}
+    - group: {{ group }}
     - mode: 600
     - defaults:
         bitbucket_user: {{ bitbucket_user }}
@@ -291,67 +289,67 @@ install_vagrant:
 install_vagrant_aws:
   cmd.run:
     - name: source ~/.profile; vagrant plugin install vagrant-aws
-    - user: {{ app_user }}
+    - user: {{ user }}
     - unless: vagrant plugin list | grep 'vagrant-aws'
     - require:
       - pkg: install_vagrant
 
-{{ supervise("dev", home, app_user, app_group, {
+{{ supervise("dev", home, user, group, {
         "watcher": {
-            "command": "\"filewatcher '**/*.*' 'harp compile "+app_path+"/assets "+app_path+"/public/static'\"",
-            "directory": app_path,
-            "user": app_user
+            "command": "\"filewatcher '**/*.*' 'harp compile "+project_path+"/assets "+project_path+"/public/static'\"",
+            "directory": project_path,
+            "user": user
         }
     })
 }}
 
 redacted_font:
   archive.extracted:
-    - name: {{ app_path }}/vendor
+    - name: {{ project_path }}/vendor
     - source: https://github.com/christiannaths/Redacted-Font/archive/old-sources.zip
     - source_hash: md5=9ff6e2ca3a69586a97235c292003ab78
     - archive_format: zip
-    - if_missing: {{ app_path }}/vendor/Redacted-Font-old-sources
-    - user: {{ app_user }}
-    - group: {{ app_group }}
+    - if_missing: {{ project_path }}/vendor/Redacted-Font-old-sources
+    - user: {{ user }}
+    - group: {{ group }}
 
-{{ app_user }}_bowerrc:
+{{ user }}_bowerrc:
   file.managed:
-    - user: {{ app_user }}
-    - group: {{ app_group }}
+    - user: {{ user }}
+    - group: {{ group }}
     - source: salt://files/.bowerrc
     - name: {{ home }}/.bowerrc
     - template: jinja
     - require:
-      - user: {{ app_user }}
+      - user: {{ user }}
     - defaults:
-      app_path: {{ app_path }}
+      project_path: {{ project_path }}
 
-{{ app_user }}_git_config:
+{{ user }}_git_config:
   file.managed:
-    - user: {{ app_user }}
-    - group: {{ app_group }}
+    - user: {{ user }}
+    - group: {{ group }}
     - source: salt://files/git_config
     - name: {{ home }}/.gitconfig
     - template: jinja
     - require:
-      - user: {{ app_user }}
+      - user: {{ user }}
     - defaults:
       home: {{ home }}
       git_email: {{ git_email }}
       git_name: {{ git_name }}
 
-{{ app_user }}_ssh_profile:
+{{ user }}_ssh_profile:
   file.managed:
-    - user: {{ app_user }}
-    - group: {{ app_group }}
+    - user: {{ user }}
+    - group: {{ group }}
     - source: salt://files/ssh_profile
     - name: {{ home }}/.profile
     - template: jinja
     - require:
-      - user: {{ app_user }}
+      - user: {{ user }}
     - defaults:
-      app_path: {{ app_path }}
+      project_path: {{ project_path }}
       mysql_user: {{ mysql_user }}
       mysql_pass: {{ mysql_pass }}
       mysql_db: {{ mysql_db }}

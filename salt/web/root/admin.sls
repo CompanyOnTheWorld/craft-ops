@@ -15,7 +15,7 @@ include:
 {% set group = 'ubuntu' -%}
 
 {% set home = "/home/"+user -%}
-{% set app_path = "/app" -%}
+{% set project_path = "/project" -%}
 {% set virtualenv = home+"/virtualenv" -%}
 
 {% set aws_access_key = project['aws_access_key'] -%}
@@ -52,7 +52,7 @@ admin_virtualenv:
 admin_requirements:
   cmd:
     - run
-    - name: "source {{ virtualenv }}/bin/activate; pip install -r {{ app_path }}/salt/web/root/files/requirements.txt"
+    - name: "source {{ virtualenv }}/bin/activate; pip install -r {{ project_path }}/salt/web/root/files/requirements.txt"
     - shell: /bin/bash
     - env:
         SHORT_NAME: {{ short_name }}
@@ -75,7 +75,7 @@ admin_profile_setup:
     - user: {{ user }}
     - template: jinja
     - defaults:
-      app_path: {{ app_path }}
+      project_path: {{ project_path }}
       aws_access_key: {{ aws_access_key }}
       aws_secret_key: {{ aws_secret_key }}
       bitbucket_user: {{ bitbucket_user }}
