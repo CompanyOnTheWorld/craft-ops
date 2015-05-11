@@ -20,7 +20,7 @@ Please also note that use of Craft is subject to their own
 
 > This has not been tested on Windows, but support is welcome :)
 
-## Getting Started
+## Start a `dev` box
 
 Clone this repo as the `name` of your project.
 
