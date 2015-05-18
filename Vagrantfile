@@ -28,7 +28,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.define "dev" do |dev|
 
-    dev.vm.box = "stackstrap/craft-ops"
+    dev.vm.box = $project['dev']['vagrant']['box']
 
     dev.ssh.forward_agent = true
 
