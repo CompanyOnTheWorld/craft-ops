@@ -1,16 +1,13 @@
 <?php
 
-if(getenv('CRAFT_ENVIRONMENT')) {
-    define('CRAFT_ENVIRONMENT', getenv('CRAFT_ENVIRONMENT'));
-} else {
-    define('CRAFT_ENVIRONMENT', 'local');
-}
+// Environment to be used in craft/config/general.php
+define('CRAFT_ENVIRONMENT', getenv('CRAFT_ENVIRONMENT'));
 
 // Path to your craft/ folder
-$craftPath = getenv('CRAFT_PATH');
+define('CRAFT_PATH', getenv('CRAFT_PATH'));
 
 // Do not edit below this line
-$path = rtrim($craftPath, '/').'/app/index.php';
+$path = rtrim(CRAFT_PATH, '/').'/app/index.php';
 
 if (!is_file($path))
 {
