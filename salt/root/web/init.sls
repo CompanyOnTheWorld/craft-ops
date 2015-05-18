@@ -1,15 +1,8 @@
-#
-# Salt States for Craft
-#
+# -*- mode: yaml -*-
+# vim: set ft=yaml ts=2 sw=2 et sts=2 :
 
 include:
-  - stackstrap.nginx
-  - stackstrap.php5.fpm
-  - stackstrap.mysql.server
-  - stackstrap.mysql.client
-  - stackstrap.env
   - stackstrap.deploy
-  - stackstrap.nvmnode
 
 php5-mcrypt:
   pkg.installed
@@ -127,7 +120,7 @@ install_composer:
 
 {{ nginxsite(project_name, user, group,
              server_name=server_name,
-             template="salt://files/craft-cms.conf",
+             template="salt://web/files/craft-cms.conf",
              create_root=False,
              root="current/public",
              cors="*",
@@ -139,14 +132,14 @@ install_composer:
 {{ user }}_authorized_keys:
   file.managed:
     - name: {{ home }}/.ssh/authorized_keys
-    - source: salt://files/authorized_keys
+    - source: salt://web/files/authorized_keys
     - makedirs: True
     - user: {{ user }}
 
 {{ user }}_ssh_config:
   file.managed:
     - name: {{ home }}/.ssh/config
-    - source: salt://files/ssh_config
+    - source: salt://web/files/ssh_config
     - template: jinja
     - makedirs: True
     - user: {{ user }}
@@ -154,7 +147,7 @@ install_composer:
 {{ user }}_private_key:
   file.managed:
     - name: {{ home }}/.ssh/web.pem
-    - source: salt://files/web.pem
+    - source: salt://web/files/web.pem
     - makedirs: True
     - user: {{ user }}
     - mode: 600
@@ -162,7 +155,7 @@ install_composer:
 {{ user }}_public_key:
   file.managed:
     - name: {{ home }}/.ssh/web.pub
-    - source: salt://files/web.pub
+    - source: salt://web/files/web.pub
     - makedirs: True
     - user: {{ user }}
 
@@ -205,14 +198,14 @@ install_composer:
   file.managed:
     - user: {{ user }}
     - group: {{ group }}
-    - source: salt://files/.bowerrc
+    - source: salt://web/files/.bowerrc
     - name: {{ home }}/.bowerrc
     - require:
       - user: {{ user }}
 
 {{ user }}_profile_setup:
   file.managed:
-    - source: salt://files/ssh_profile
+    - source: salt://web/files/ssh_profile
     - name: {{ home }}/.profile
     - user: {{ user }}
     - template: jinja
@@ -236,5 +229,3 @@ install_composer:
 #
 
 {% endfor %}
-
-# vim: set ft=yaml ts=2 sw=2 sts=2 et ai :

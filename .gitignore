@@ -66,6 +66,8 @@ license.key
 
 # Craft Ops
 .vagrant/machines/dev
+.vagrant/machines/base
+package.box
 vendor
 *.pem
 *.pub

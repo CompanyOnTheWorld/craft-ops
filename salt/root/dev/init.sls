@@ -1,16 +1,5 @@
 # -*- mode: yaml -*-
-# vim: set ft=ruby ts=2 sw=2 et sts=2 :
-
-include:
-  - stackstrap.env
-  - stackstrap.virtualenv
-  - stackstrap.supervisor
-  - stackstrap.nginx
-  - stackstrap.php5.fpm
-  - stackstrap.mysql.server
-  - stackstrap.mysql.client
-  - stackstrap.rvmruby
-  - stackstrap.nvmnode
+# vim: set ft=yaml ts=2 sw=2 et sts=2 :
 
 {% from "stackstrap/supervisor/macros.sls" import supervise -%}
 {% from "stackstrap/nginx/macros.sls" import nginxsite %}
@@ -56,7 +45,7 @@ include:
 {{ user }}_ssh_config:
   file.managed:
     - name: {{ home }}/.ssh/config
-    - source: salt://files/ssh_config
+    - source: salt://dev/files/ssh_config
     - template: jinja
     - makedirs: True
     - user: {{ user }}
@@ -79,7 +68,7 @@ include:
 {{ project_name }}_requirements:
   cmd:
     - run
-    - name: "source {{ virtualenv }}/bin/activate; pip install -r {{ project_path }}/salt/dev/root/files/requirements.txt"
+    - name: "source {{ virtualenv }}/bin/activate; pip install -r {{ project_path }}/salt/root/dev/files/requirements.txt"
     - shell: /bin/bash
     - env:
         SHORT_NAME: {{ project_name }}
@@ -109,7 +98,7 @@ include:
 }}
 
 {{ nginxsite(project_name, user, group,
-             template="salt://files/craft-cms.conf",
+             template="salt://dev/files/craft-cms.conf",
 	           create_root=False,
 	           root="public",
              listen="8000",
@@ -248,7 +237,7 @@ php5-restart:
 
 {{ home }}/.aws/config:
   file.managed:
-    - source: salt://files/aws.config
+    - source: salt://dev/files/aws.config
     - template: jinja
     - user: {{ user }}
     - group: {{ group }}
@@ -260,7 +249,7 @@ php5-restart:
 
 {{ home }}/.bitbucket:
   file.managed:
-    - source: salt://files/bitbucket.conf
+    - source: salt://dev/files/bitbucket.conf
     - template: jinja
     - user: {{ user }}
     - group: {{ group }}
@@ -305,7 +294,7 @@ redacted_font:
   file.managed:
     - user: {{ user }}
     - group: {{ group }}
-    - source: salt://files/.bowerrc
+    - source: salt://dev/files/.bowerrc
     - name: {{ home }}/.bowerrc
     - template: jinja
     - require:
@@ -317,7 +306,7 @@ redacted_font:
   file.managed:
     - user: {{ user }}
     - group: {{ group }}
-    - source: salt://files/git_config
+    - source: salt://dev/files/git_config
     - name: {{ home }}/.gitconfig
     - template: jinja
     - require:
@@ -331,7 +320,7 @@ redacted_font:
   file.managed:
     - user: {{ user }}
     - group: {{ group }}
-    - source: salt://files/ssh_profile
+    - source: salt://dev/files/ssh_profile
     - name: {{ home }}/.profile
     - template: jinja
     - require:

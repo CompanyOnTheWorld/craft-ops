@@ -28,10 +28,25 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.define "dev" do |dev|
 
-    dev.vm.box = $project['dev']['vagrant']['box']
-    dev.vm.box_url = $project['dev']['vagrant']['box_url']
-    dev.vm.box_download_checksum_type = $project['dev']['vagrant']['box_download_checksum_type']
-    dev.vm.box_download_checksum = $project['dev']['vagrant']['box_download_checksum']
+    dev.vm.box = "stackstrap/craft-ops"
+
+    dev.ssh.forward_agent = true
+
+    dev.vm.network "forwarded_port", guest: 8000, host: 8000
+
+    dev.vm.synced_folder ".", "/project"
+
+    if File.exist?(ENV['HOME']+'/ops.conf')
+      dev.vm.provision :file, source: '~/ops.conf', destination: $project['dev']['ops_conf_path']
+    end
+
+    dev.vm.provision :salt do |salt|
+      salt.install_type = "git"
+      salt.install_args = "v2015.5.0"
+      salt.minion_config = "salt/config/dev.conf"
+      salt.pillar($project)
+      salt.run_highstate = true
+    end
 
     dev.vm.provider "virtualbox" do |v|
       host = RbConfig::CONFIG['host_os']
@@ -53,25 +68,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       v.customize ["modifyvm", :id, "--memory", mem]
       v.customize ["modifyvm", :id, "--cpus", cpus]
     end
-
-    dev.ssh.forward_agent = true
-
-    dev.vm.network "forwarded_port", guest: 8000, host: 8000
-
-    dev.vm.synced_folder ".", "/project"
-
-    if File.exist?(ENV['HOME']+'/ops.conf')
-      dev.vm.provision :file, source: '~/ops.conf', destination: $project['dev']['ops_conf_path']
-    end
-
-    dev.vm.provision :salt do |salt|
-      salt.install_type = "git"
-      salt.install_args = "v2015.2.0rc2"
-      salt.minion_config = "salt/dev/minion"
-      salt.run_highstate = false
-    end
-
-    dev.vm.provision :shell, path: $stackstrap_install, :args => "--project_config='#{$project.to_json}'"
 
   end
 
@@ -108,12 +104,55 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
     web.vm.provision :salt do |salt|
       salt.install_type = "git"
-      salt.install_args = "v2014.7.4"
-      salt.minion_config = "salt/web/minion"
+      salt.install_args = "v2015.5.0"
+      salt.minion_config = "salt/config/web.conf"
       salt.run_highstate = false
     end
 
     web.vm.provision :shell, path: $stackstrap_install, :args => "--project_config='#{$project.to_json}'"
+
+  end
+
+  config.vm.define "base" do |base|
+
+    base.vm.box = $project['base']['vagrant']['box']
+    base.vm.box_url = $project['base']['vagrant']['box_url']
+    base.vm.box_download_checksum_type = $project['base']['vagrant']['box_download_checksum_type']
+    base.vm.box_download_checksum = $project['base']['vagrant']['box_download_checksum']
+
+    base.vm.provider "virtualbox" do |v|
+      host = RbConfig::CONFIG['host_os']
+
+      # Give VM 1/4 system memory & access to all cpu cores on the host
+      if host =~ /darwin/
+        cpus = `sysctl -n hw.ncpu`.to_i
+        # sysctl returns Bytes and we need to convert to MB
+        mem = `sysctl -n hw.memsize`.to_i / 1024 / 1024 / 4
+      elsif host =~ /linux/
+        cpus = `nproc`.to_i
+        # meminfo shows KB and we need to convert to MB
+        mem = `grep 'MemTotal' /proc/meminfo | sed -e 's/MemTotal://' -e 's/ kB//'`.to_i / 1024 / 4
+      else # sorry Windows folks, I can't help you
+        cpus = 2
+        mem = 1024
+      end
+
+      v.customize ["modifyvm", :id, "--memory", mem]
+      v.customize ["modifyvm", :id, "--cpus", cpus]
+    end
+
+    base.ssh.forward_agent = true
+
+    base.vm.synced_folder ".", "/project"
+
+    base.vm.provision :salt do |salt|
+      salt.install_type = "git"
+      salt.install_args = "v2015.5.0"
+      salt.minion_config = "salt/config/base.conf"
+      salt.run_highstate = false
+    end
+
+    base.vm.provision :shell, path: $stackstrap_install
 
   end
 

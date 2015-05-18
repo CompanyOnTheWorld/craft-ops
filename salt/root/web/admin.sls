@@ -52,7 +52,7 @@ admin_virtualenv:
 admin_requirements:
   cmd:
     - run
-    - name: "source {{ virtualenv }}/bin/activate; pip install -r {{ project_path }}/salt/web/root/files/requirements.txt"
+    - name: "source {{ virtualenv }}/bin/activate; pip install -r {{ project_path }}/salt/root/web/files/requirements.txt"
     - shell: /bin/bash
     - env:
         SHORT_NAME: {{ project_name }}
@@ -63,14 +63,14 @@ admin_requirements:
 admin_private_key:
   file.managed:
     - name: {{ home }}/.ssh/web.pem
-    - source: salt://files/web.pem
+    - source: salt://web/files/web.pem
     - makedirs: True
     - user: {{ user }}
     - mode: 600
 
 admin_profile_setup:
   file.managed:
-    - source: salt://files/ssh_profile_admin
+    - source: salt://web/files/ssh_profile_admin
     - name: {{ home }}/.profile
     - user: {{ user }}
     - template: jinja
