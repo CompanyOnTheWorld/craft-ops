@@ -24,11 +24,11 @@ You only need these tools installed, and both have builds for most systems.
 
 ## Get started with a `dev` box...
 
-It is really easy, just clone this repo and `up` the box.
+It is really easy, just clone this repo and `vagrant up` the `dev` box.
 
-```
-git clone https://github.com/stackstrap/craft-ops.git project_name
-vagrant up dev
+```shell
+$ git clone https://github.com/stackstrap/craft-ops.git project_name
+$ vagrant up dev
 ```
 
 [craft_link]: https://buildwithcraft.com/
