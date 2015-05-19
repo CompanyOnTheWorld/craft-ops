@@ -15,26 +15,19 @@ Please also note that use of Craft is subject to their own
 
 ##### Requirements
 
+You only need these tools installed, and both have builds for most systems.
+
 - [Vagrant][vagrant_link]
 - [VirtualBox][virtualbox_link]
 
 > This has not been tested on Windows, but support is welcome :)
 
-## Start a `dev` box
+## Get started with a `dev` box...
 
-Clone this repo as the `name` of your project.
-
-```
-git clone https://github.com/stackstrap/craft-ops.git name
-```
-
-Then enter the same `name` value into [`project.conf`][project_conf_link].
-
-> Keep your `name` short and without special characters.
-
-**Then just build the `dev` vm:**
+It is really easy, just clone this repo and `up` the box.
 
 ```
+git clone https://github.com/stackstrap/craft-ops.git project_name
 vagrant up dev
 ```
 

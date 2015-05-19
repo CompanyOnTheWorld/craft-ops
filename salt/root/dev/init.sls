@@ -10,8 +10,8 @@
 {% from "stackstrap/nvmnode/macros.sls" import nvmnode %}
 
 {% set project = pillar -%}
-{% set project_name = project['name'] -%}
 
+{% set project_name = project['name'] -%}
 {% set aws_access_key = project['aws_access_key'] -%}
 {% set aws_secret_key = project['aws_secret_key'] -%}
 {% set bitbucket_user = project['bitbucket_user'] -%}
@@ -21,15 +21,15 @@
 {% set group = project['dev']['group'] -%}
 {% set home = "/home/" + user -%}
 {% set virtualenv = home + "/virtualenv" -%}
-{% set project_path = "/project" -%}
+{% set project_path = project['dev']['path'] -%}
 
 {% set git_repo = project['git']['repo'] %}
 {% set git_email = project['git']['email'] %}
 {% set git_name = project['git']['name'] %}
 
-{% set mysql_user = project_name %}
-{% set mysql_pass = project_name %}
-{% set mysql_db = project_name %}
+{% set mysql_user = project['dev']['mysql_user'] %}
+{% set mysql_pass = project['dev']['mysql_pass'] %}
+{% set mysql_db = project['dev']['mysql_db'] %}
 
 {{ mysql_user_db(mysql_user, mysql_pass) }}
 
@@ -40,7 +40,7 @@
   cmd.run:
     - name: unzip -p {{ project_path }}/salt/dev/root/files/craft-cms-backup.zip | mysql -u {{ mysql_user }} -p{{ mysql_pass }} {{ mysql_user }}
 
-{{ env(project_name, user, group) }}
+{{ env(user, group) }}
 
 {{ user }}_ssh_config:
   file.managed:
@@ -56,7 +56,7 @@
     - present
     - user: {{ user }}
 
-{{ project_name }}_virtualenv:
+{{ user }}_virtualenv:
   cmd:
     - run
     - name: "virtualenv {{ virtualenv }} && rm -f {{ virtualenv }}/lib*/*/no-global-site-packages.txt"
@@ -65,27 +65,25 @@
     - require:
       - pkg: virtualenv_pkgs
 
-{{ project_name }}_requirements:
+{{ user }}_requirements:
   cmd:
     - run
     - name: "source {{ virtualenv }}/bin/activate; pip install -r {{ project_path }}/salt/root/dev/files/requirements.txt"
     - shell: /bin/bash
-    - env:
-        SHORT_NAME: {{ project_name }}
     - user: vagrant
     - require:
-      - cmd: {{ project_name }}_virtualenv
+      - cmd: {{ user }}_virtualenv
 
-{{ rvmruby(project_name, user, group,
+{{ rvmruby(user, group,
            rvm_globals=['filewatcher']) 
 }}
 
-{{ nvmnode(project_name, user, group,
+{{ nvmnode(user, group,
            ignore_package_json=True,
            node_globals=['bower', 'harp']) 
 }}
   
-{{ php5_fpm_instance(project_name, '5000', user, group,
+{{ php5_fpm_instance(user, group, '5000',
                      envs={
                        'CRAFT_ENVIRONMENT': 'local',
                        'CRAFT_PATH': craft_path,
@@ -97,7 +95,7 @@
 		                 })
 }}
 
-{{ nginxsite(project_name, user, group,
+{{ nginxsite(user, group,
              template="salt://dev/files/craft-cms.conf",
 	           create_root=False,
 	           root="public",

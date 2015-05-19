@@ -113,14 +113,14 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   end
 
-  config.vm.define "base" do |base|
+  config.vm.define "basebox" do |basebox|
 
-    base.vm.box = $project['base']['vagrant']['box']
-    base.vm.box_url = $project['base']['vagrant']['box_url']
-    base.vm.box_download_checksum_type = $project['base']['vagrant']['box_download_checksum_type']
-    base.vm.box_download_checksum = $project['base']['vagrant']['box_download_checksum']
+    basebox.vm.box = $project['basebox']['vagrant']['box']
+    basebox.vm.box_url = $project['basebox']['vagrant']['box_url']
+    basebox.vm.box_download_checksum_type = $project['basebox']['vagrant']['box_download_checksum_type']
+    basebox.vm.box_download_checksum = $project['basebox']['vagrant']['box_download_checksum']
 
-    base.vm.provider "virtualbox" do |v|
+    basebox.vm.provider "virtualbox" do |v|
       host = RbConfig::CONFIG['host_os']
 
       # Give VM 1/4 system memory & access to all cpu cores on the host
@@ -141,18 +141,18 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       v.customize ["modifyvm", :id, "--cpus", cpus]
     end
 
-    base.ssh.forward_agent = true
+    basebox.ssh.forward_agent = true
 
-    base.vm.synced_folder ".", "/project"
+    basebox.vm.synced_folder ".", "/project"
 
-    base.vm.provision :salt do |salt|
+    basebox.vm.provision :salt do |salt|
       salt.install_type = "git"
       salt.install_args = "v2015.5.0"
-      salt.minion_config = "salt/config/base.conf"
+      salt.minion_config = "salt/config/basebox.conf"
       salt.run_highstate = false
     end
 
-    base.vm.provision :shell, path: $stackstrap_install
+    basebox.vm.provision :shell, path: $stackstrap_install, :args => "--project_config='#{$project.to_json}'"
 
   end
 

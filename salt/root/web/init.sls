@@ -68,14 +68,14 @@ install_composer:
 {% set uploads_path = deploy_path + "/shared/assets" -%}
 {% set craft_path = deploy_path + "/shared/vendor/Craft-Release-master" -%}
 
-{{ env(project_name, user, group, uid=uid, gid=gid) }}
+{{ env(user, group, uid=uid, gid=gid) }}
 
-{{ deploy(project_name, user, group,
+{{ deploy(user, group,
           repo=repo,
           identity=home+'/.ssh/web.pem')
 }}
 
-{{ nvmnode(project_name, user, group,
+{{ nvmnode(user, group,
            ignore_package_json=True,
            node_globals=['bower', 'grunt', 'node-sass', 'harp']) 
 }}
@@ -90,7 +90,8 @@ install_composer:
     - require:
       - cmd: {{ user }}_install_node
 
-{{ php5_fpm_instance(project_name+"_"+stage, port, user, group,
+{{ php5_fpm_instance(user, group, port,
+                     name=project_name,
                      envs={
                       'PROJECT_PATH': project_path,
                       'DEPLOY_PATH': deploy_path,
@@ -118,7 +119,8 @@ install_composer:
   {% set server_name = project_name -%}
 {% endif %}
 
-{{ nginxsite(project_name, user, group,
+{{ nginxsite(user, group,
+             name=project_name,
              server_name=server_name,
              template="salt://web/files/craft-cms.conf",
              create_root=False,
