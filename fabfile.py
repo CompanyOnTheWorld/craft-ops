@@ -68,7 +68,7 @@ def web():
     env.hosts = [project['web']['server']]
     env.host = project['web']['server']
     env.host_string = project['web']['server']
-    env.key_filename = 'salt/web/root/files/web.pem'
+    env.key_filename = 'salt/root/web/files/web.pem'
     
 
 @task
@@ -236,13 +236,13 @@ def setup():
     # AWS
     #
 
-    local("aws ec2 create-key-pair --key-name "+project['name']+" --query 'KeyMaterial' --output text > salt/web/root/files/web.pem")
-    local("chmod 600 salt/web/root/files/web.pem")
-    local("ssh-add salt/web/root/files/web.pem")
-    local("ssh-keygen -f salt/web/root/files/web.pem -y > salt/web/root/files/web.pub")
-    local("cp salt/web/root/files/web.pem salt/dev/root/files/web.pem")
-    local("cp salt/web/root/files/web.pub salt/dev/root/files/web.pub")
-    local("cp salt/web/root/files/web.pub salt/web/root/files/authorized_keys")
+    local("aws ec2 create-key-pair --key-name "+project['name']+" --query 'KeyMaterial' --output text > salt/root/web/files/web.pem")
+    local("chmod 600 salt/root/web/files/web.pem")
+    local("ssh-add salt/root/web/files/web.pem")
+    local("ssh-keygen -f salt/root/web/files/web.pem -y > salt/root/web/files/web.pub")
+    local("cp salt/root/web/files/web.pem salt/root/dev/files/web.pem")
+    local("cp salt/root/web/files/web.pub salt/root/dev/files/web.pub")
+    local("cp salt/root/web/files/web.pub salt/root/web/files/authorized_keys")
 
     elastic_ip = json.loads(local("aws ec2 allocate-address --domain vpc", capture=True))
     project_yaml['web']['server'] = elastic_ip['PublicIp']
@@ -293,7 +293,7 @@ def setup():
     project_yaml['git']['repo'] = repo_url
     pprint.pprint(result)
 
-    public_key = local("ssh-keygen -f salt/web/root/files/web.pem -y", capture=True)
+    public_key = local("ssh-keygen -f salt/root/web/files/web.pem -y", capture=True)
     success, result = bb.ssh.create(public_key, project['name'])
     pprint.pprint(result)
 
@@ -354,11 +354,11 @@ def clean():
     # AWS
     #
 
-    local("rm -f salt/web/root/files/web.pem")
-    local("rm -f salt/web/root/files/web.pub")
-    local("rm -f salt/dev/root/files/web.pem")
-    local("rm -f salt/dev/root/files/web.pub")
-    local("cat /dev/null > salt/web/root/files/authorized_keys")
+    local("rm -f salt/root/web/files/web.pem")
+    local("rm -f salt/root/web/files/web.pub")
+    local("rm -f salt/root/dev/files/web.pem")
+    local("rm -f salt/root/dev/files/web.pub")
+    local("cat /dev/null > salt/root/web/files/authorized_keys")
     local("aws ec2 delete-key-pair --key-name "+project['name'], capture=True)
 
     if project['web']['aws']['address_allocation_id']:
