@@ -26,7 +26,7 @@ You only need these tools installed, and both have builds for most systems.
 
 It is really easy, just clone this repo and `vagrant up` the `dev` box.
 
-```bash
+```shell
 $ git clone https://github.com/stackstrap/craft-ops.git project_name
 $ vagrant up dev
 ```
