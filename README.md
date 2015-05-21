@@ -33,7 +33,7 @@ $ vagrant up dev
 
 You can then hit the dev server at `http://localhost:8000`
 
-## Setup the rest...
+## Setting up the rest...
 
 #### How the configuration works
 
@@ -42,14 +42,21 @@ object is created by merging a series of YAML files on top of each other.
 
 `defaults.conf` - This file is the base layer and just for reference.
 
-`project.conf` - This is the main where you should put custom properties.
+`project.conf` - This is the main file where you should put custom properties.
 
 `private.conf` (optional) - This file is where you would store private project
-data like access keys. You should `.gitignore` this file or encrypt it.
+data like access keys. You should `.gitignore` this file or encrypt it if you do
+use it.
 
 `~/ops.conf` (optional) - This is a global config file that is pulled in from your
-host system's `$HOME` directory.  You can also keep access keys here if you need
-them for all projects.
+host system's `$HOME` directory when the `dev` box is provisioned. You can keep 
+access keys here if you need them for all projects.
+
+#### Getting your keys in place
+
+You will need to get a 
+
+####
 
 [craft_link]: https://buildwithcraft.com/
 [craft_license]: https://buildwithcraft.com/license
