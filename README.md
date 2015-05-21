@@ -50,11 +50,8 @@ use it.
 
 `~/ops.conf` (optional) - This is a global config file that is pulled in from your
 host system's `$HOME` directory when the `dev` box is provisioned. You can keep 
-access keys here if you need them for all projects.
-
-#### Getting your keys in place
-
-You will need to get a 
+access keys here if you need them for all projects. You will need to run
+`vagrant provision dev` if you change this file.
 
 ####
 
