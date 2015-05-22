@@ -5,7 +5,7 @@ include:
   - stackstrap.env
   - stackstrap.virtualenv
 
-{% from "stackstrap/env/macros.sls" import stackstrap_env -%}
+{% from "stackstrap/env/macros.sls" import env -%}
 {% from "stackstrap/nvmnode/macros.sls" import nvmnode %}
 
 {% set project = pillar -%}
@@ -23,9 +23,9 @@ include:
 {% set bitbucket_user = project['bitbucket_user'] -%}
 {% set bitbucket_pass_token = project['bitbucket_pass_token'] -%}
 
-{{ stackstrap_env(project_name, user, group) }}
+{{ env(user, group) }}
 
-{{ nvmnode(project_name, user, group,
+{{ nvmnode(user, group,
            ignore_package_json=True,
            node_globals=['bower', 'grunt', 'node-sass', 'harp']) 
 }}

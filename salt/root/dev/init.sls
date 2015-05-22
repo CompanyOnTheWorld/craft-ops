@@ -97,7 +97,6 @@
 
 {{ nginxsite(user, group,
              template="salt://dev/files/craft-cms.conf",
-	           create_root=False,
 	           root="public",
              listen="8000",
              server_name="_",
@@ -277,16 +276,6 @@ install_vagrant_aws:
         }
     })
 }}
-
-redacted_font:
-  archive.extracted:
-    - name: {{ project_path }}/vendor
-    - source: https://github.com/christiannaths/Redacted-Font/archive/old-sources.zip
-    - source_hash: md5=9ff6e2ca3a69586a97235c292003ab78
-    - archive_format: zip
-    - if_missing: {{ project_path }}/vendor/Redacted-Font-old-sources
-    - user: {{ user }}
-    - group: {{ group }}
 
 {{ user }}_bowerrc:
   file.managed:

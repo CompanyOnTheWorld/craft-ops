@@ -1,9 +1,6 @@
 # -*- mode: yaml -*-
 # vim: set ft=yaml ts=2 sw=2 et sts=2 :
 
-include:
-  - stackstrap.deploy
-
 php5-mcrypt:
   pkg.installed
 
@@ -50,13 +47,10 @@ install_composer:
 
 {% set user = stages[stage]['user'] -%}
 {% set group = stages[stage]['group'] -%}
-{% set uid = stages[stage]['uid'] -%}
-{% set gid = stages[stage]['gid'] -%}
 
 {% set home = '/home/' + user -%}
 
-{% set deploy_path = home + '/deployments' -%}
-{% set project_path = deploy_path + '/current' -%}
+{% set project_path = home + '/current' -%}
 {% set repo = project['git']['repo'] -%}
 
 {% set port = stages[stage]['port'] -%}
@@ -65,10 +59,18 @@ install_composer:
 {% set mysql_pass = stages[stage]['mysql_pass'] -%}
 {% set mysql_db = stages[stage]['mysql_db'] -%}
 
-{% set uploads_path = deploy_path + "/shared/assets" -%}
-{% set craft_path = deploy_path + "/shared/vendor/Craft-Release-master" -%}
+{% set uploads_path = home + "/shared/assets" -%}
+{% set craft_path = home + "/shared/vendor/Craft-Release-master" -%}
 
-{{ env(user, group, uid=uid, gid=gid) }}
+{{ env(user, group) }}
+
+{{ user }}_private_key:
+  file.managed:
+    - name: {{ home }}/.ssh/web.pem
+    - source: salt://web/files/web.pem
+    - makedirs: True
+    - user: {{ user }}
+    - mode: 600
 
 {{ deploy(user, group,
           repo=repo,
@@ -94,7 +96,6 @@ install_composer:
                      name=project_name,
                      envs={
                       'PROJECT_PATH': project_path,
-                      'DEPLOY_PATH': deploy_path,
                       'UPLOADS_PATH': uploads_path,
                       'CRAFT_ENVIRONMENT': stage,
                       'CRAFT_PATH': craft_path,
@@ -120,10 +121,10 @@ install_composer:
 {% endif %}
 
 {{ nginxsite(user, group,
+             project_path=project_path,
              name=project_name,
              server_name=server_name,
              template="salt://web/files/craft-cms.conf",
-             create_root=False,
              root="current/public",
              cors="*",
              defaults={
@@ -146,14 +147,6 @@ install_composer:
     - makedirs: True
     - user: {{ user }}
 
-{{ user }}_private_key:
-  file.managed:
-    - name: {{ home }}/.ssh/web.pem
-    - source: salt://web/files/web.pem
-    - makedirs: True
-    - user: {{ user }}
-    - mode: 600
-
 {{ user }}_public_key:
   file.managed:
     - name: {{ home }}/.ssh/web.pub
@@ -169,15 +162,14 @@ install_composer:
 
 {{ user }}_download_craft:
   archive.extracted:
-    - name: {{ deploy_path }}/shared/vendor
+    - name: {{ user }}/shared/vendor
     - source: https://github.com/pixelandtonic/Craft-Release/archive/master.tar.gz 
     - source_hash: md5=0cf267bac9a021a4adcbf983dfd0f8ef
     - archive_format: tar
-    - user: {{ user }}
-    - group: {{ group }}
-    - if_missing: {{ deploy_path }}/shared/vendor/Craft-Release-master
+    - archive_user: {{ user }}
+    - if_missing: {{ user }}/shared/vendor/Craft-Release-master
 
-{{ deploy_path }}/shared/vendor/Craft-Release-master:
+{{ user }}/shared/vendor/Craft-Release-master:
   file.directory:
     - user: {{ user }}
     - group: {{ group }}
@@ -185,16 +177,6 @@ install_composer:
     - recurse:
       - user
       - group
-
-{{ user }}_redacted_font:
-  archive.extracted:
-    - name: {{ deploy_path }}/shared/vendor
-    - source: https://github.com/christiannaths/Redacted-Font/archive/old-sources.zip
-    - source_hash: md5=9ff6e2ca3a69586a97235c292003ab78
-    - archive_format: zip
-    - if_missing: {{ deploy_path }}/shared/vendor/Redacted-Font-old-sources
-    - user: {{ user }}
-    - group: {{ group }}
 
 {{ user }}_bowerrc:
   file.managed:
@@ -216,7 +198,6 @@ install_composer:
     - defaults:
       stage: {{ stage }}
       project_path: {{ project_path }}
-      deploy_path: {{ deploy_path }}
       mysql_user: {{ mysql_user }}
       mysql_pass: {{ mysql_pass }}
       mysql_db: {{ mysql_db }}
