@@ -169,7 +169,7 @@ install_composer:
     - archive_user: {{ home }}
     - if_missing: {{ home }}/shared/vendor/Craft-Release-master
 
-{{ user }}/shared/vendor/Craft-Release-master:
+{{ home }}/shared/vendor/Craft-Release-master:
   file.directory:
     - user: {{ user }}
     - group: {{ group }}
