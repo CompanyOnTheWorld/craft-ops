@@ -162,12 +162,12 @@ install_composer:
 
 {{ user }}_download_craft:
   archive.extracted:
-    - name: {{ user }}/shared/vendor
+    - name: {{ home }}/shared/vendor
     - source: https://github.com/pixelandtonic/Craft-Release/archive/master.tar.gz 
     - source_hash: md5=0cf267bac9a021a4adcbf983dfd0f8ef
     - archive_format: tar
-    - archive_user: {{ user }}
-    - if_missing: {{ user }}/shared/vendor/Craft-Release-master
+    - archive_user: {{ home }}
+    - if_missing: {{ home }}/shared/vendor/Craft-Release-master
 
 {{ user }}/shared/vendor/Craft-Release-master:
   file.directory:
