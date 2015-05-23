@@ -226,6 +226,7 @@ php5-restart:
     - require:
       - cmd: php-mcrypt-enable
 
+{% if aws_access_key %}
 {{ home }}/.aws:
   file.directory:
     - user: {{ user }}
@@ -243,17 +244,7 @@ php5-restart:
         aws_access_key: {{ aws_access_key }} 
         aws_secret_key: {{ aws_secret_key }} 
         region: us-east-1
-
-{{ home }}/.bitbucket:
-  file.managed:
-    - source: salt://dev/files/bitbucket.conf
-    - template: jinja
-    - user: {{ user }}
-    - group: {{ group }}
-    - mode: 600
-    - defaults:
-        bitbucket_user: {{ bitbucket_user }}
-        bitbucket_pass_token: {{ bitbucket_pass_token }}
+{% endif %}
 
 install_vagrant:
   pkg.installed:
