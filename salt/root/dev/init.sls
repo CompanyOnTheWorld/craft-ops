@@ -226,7 +226,7 @@ php5-restart:
     - require:
       - cmd: php-mcrypt-enable
 
-{% if aws_access_key is defined %}
+{% if aws_access_key %}
 {{ home }}/.aws:
   file.directory:
     - user: {{ user }}
@@ -308,11 +308,11 @@ install_vagrant_aws:
       mysql_user: {{ mysql_user }}
       mysql_pass: {{ mysql_pass }}
       mysql_db: {{ mysql_db }}
-      {% if aws_access_key is defined %}
+      {% if aws_access_key %}
       aws_access_key: {{ aws_access_key }}
       aws_secret_key: {{ aws_secret_key }}
       {% endif %}
-      {% if bitbucket_user is defined %}
+      {% if bitbucket_user %}
       bitbucket_user: {{ bitbucket_user }}
       bitbucket_pass_token: {{ bitbucket_pass_token }}
       {% endif %}

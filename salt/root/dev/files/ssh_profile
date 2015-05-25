@@ -8,11 +8,11 @@ export CRAFT_ENVIRONMENT=local
 export MYSQL_USER={{ mysql_user }}
 export MYSQL_PASS={{ mysql_pass }}
 export MYSQL_DB={{ mysql_db }}
-{% if aws_access_key is defined %}
+{% if aws_access_key %}
 export AWS_ACCESS_KEY={{ aws_access_key }}
 export AWS_SECRET_KEY={{ aws_secret_key }}
 {% endif %}
-{% if bitbucket_user is defined %}
+{% if bitbucket_user %}
 export BITBUCKET_USER={{ bitbucket_user }}
 export BITBUCKET_PASS_TOKEN={{ bitbucket_pass_token }}
 {% endif %}
