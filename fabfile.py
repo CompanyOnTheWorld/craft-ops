@@ -35,7 +35,9 @@ defaults = yaml.load(defaults_file_content)
 
 with open('project.conf') as project_file:
     project_file_content = project_file.read()
+
 project_yaml = ruamel.yaml.load(project_file_content, ruamel.yaml.RoundTripLoader)
+
 project = yaml.load(project_file_content)
 project = dict_merge(defaults, project)
 
@@ -232,6 +234,10 @@ def releases(method="clean"):
 @hosts('localhost')
 def setup():
 
+    project_yaml['web'] = {}
+    project_yaml['aws'] = {}
+    project_yaml['git'] = {}
+
     #
     # AWS
     #
@@ -246,29 +252,29 @@ def setup():
 
     elastic_ip = json.loads(local("aws ec2 allocate-address --domain vpc", capture=True))
     project_yaml['web']['server'] = elastic_ip['PublicIp']
-    project_yaml['web']['aws']['elastic_ip'] = elastic_ip['PublicIp']
-    project_yaml['web']['aws']['address_allocation_id'] = elastic_ip['AllocationId']
+    project_yaml['aws']['elastic_ip'] = elastic_ip['PublicIp']
+    project_yaml['aws']['address_allocation_id'] = elastic_ip['AllocationId']
 
     vpc = json.loads(local("aws ec2 create-vpc --cidr-block 10.0.0.0/16", capture=True))['Vpc']
     print vpc
-    project_yaml['web']['aws']['vpc_id'] = vpc['VpcId']
+    project_yaml['aws']['vpc_id'] = vpc['VpcId']
 
     local("aws ec2 modify-vpc-attribute --vpc-id "+vpc['VpcId']+" --enable-dns-support", capture=True)
     local("aws ec2 modify-vpc-attribute --vpc-id "+vpc['VpcId']+" --enable-dns-hostnames", capture=True)
 
     internet_gateway = json.loads(local("aws ec2 create-internet-gateway", capture=True))['InternetGateway']
     print internet_gateway
-    project_yaml['web']['aws']['internet_gateway_id'] = internet_gateway['InternetGatewayId']
+    project_yaml['aws']['internet_gateway_id'] = internet_gateway['InternetGatewayId']
 
     local("aws ec2 attach-internet-gateway --internet-gateway-id "+internet_gateway['InternetGatewayId']+" --vpc-id "+vpc['VpcId'])
 
     subnet = json.loads(local("aws ec2 create-subnet --vpc-id "+vpc['VpcId']+" --cidr-block 10.0.0.0/24", capture=True))['Subnet']
     print subnet
-    project_yaml['web']['aws']['subnet_id'] = subnet['SubnetId']
+    project_yaml['aws']['subnet_id'] = subnet['SubnetId']
 
     route_table = json.loads(local("aws ec2 create-route-table --vpc-id "+vpc['VpcId'], capture=True))['RouteTable']
     print route_table
-    project_yaml['web']['aws']['route_table_id'] = route_table['RouteTableId']
+    project_yaml['aws']['route_table_id'] = route_table['RouteTableId']
 
     local("aws ec2 associate-route-table --route-table-id "+route_table['RouteTableId']+" --subnet-id "+subnet['SubnetId'])
     local("aws ec2 create-route --route-table-id "+route_table['RouteTableId']+" --destination-cidr-block 0.0.0.0/0 --gateway-id "+internet_gateway['InternetGatewayId'])
@@ -280,15 +286,15 @@ def setup():
     local("aws ec2 authorize-security-group-ingress --group-id "+security_group['GroupId']+" --protocol tcp --port 80 --cidr 0.0.0.0/0")
     local("aws ec2 authorize-security-group-ingress --group-id "+security_group['GroupId']+" --protocol tcp --port 443 --cidr 0.0.0.0/0")
 
-    project_yaml['web']['aws']['security_groups'] = [security_group['GroupId']]
+    project_yaml['aws']['security_groups'] = [security_group['GroupId']]
 
     #
     # Bitbucket
     #
 
-    bb = Bitbucket(project['bitbucket_user'], project['bitbucket_pass_token'])
+    bb = Bitbucket(project['bitbucket']['user'], project['bitbucket']['token'])
     success, result = bb.repository.create(project['name'])
-    repo_url = "git@bitbucket.org:"+project['bitbucket_user']+"/"+project['name']+".git"
+    repo_url = "git@bitbucket.org:"+project['bitbucket']['user']+"/"+project['name']+".git"
 
     project_yaml['git']['repo'] = repo_url
     pprint.pprint(result)
@@ -328,14 +334,12 @@ def clean():
     # Bitbucket
     #
 
-    bb = Bitbucket(project['bitbucket_user'], project['bitbucket_pass_token'])
+    bb = Bitbucket(project['bitbucket']['user'], project['bitbucket']['token'])
 
     bb.repository.delete(project['name'])
 
     with settings(warn_only=True):
         local("git remote rm bitbucket")
-
-    project_yaml['git']['repo'] = None
 
     success, ssh_keys = bb.ssh.all()
 
@@ -355,14 +359,10 @@ def clean():
     local("cat /dev/null > salt/root/web/files/authorized_keys")
     local("aws ec2 delete-key-pair --key-name "+project['name'], capture=True)
 
-    if project['web']['aws']['address_allocation_id']:
-        local("aws ec2 release-address --allocation-id "+project['web']['aws']['address_allocation_id'], capture=True)
+    if project['aws']['address_allocation_id']:
+        local("aws ec2 release-address --allocation-id "+project['aws']['address_allocation_id'], capture=True)
 
-    project_yaml['web']['aws']['elastic_ip'] = None
-    project_yaml['web']['aws']['address_allocation_id'] = None
-    project_yaml['web']['server'] = None
-
-    vpc_id = project['web']['aws']['vpc_id']
+    vpc_id = project['aws']['vpc_id']
 
     security_groups = local("aws ec2 describe-security-groups --filters Name=vpc-id,Values="+vpc_id+" --output json --query 'SecurityGroups[]'", capture=True)
     if security_groups != "": 
@@ -370,7 +370,6 @@ def clean():
             print security_group
             if security_group['GroupName'] != 'default':
                 local("aws ec2 delete-security-group --group-id "+security_group['GroupId'], capture=True)
-                project_yaml['web']['aws']['security_groups'] = None
     else:
         print "No SecurityGroups"
 
@@ -382,7 +381,6 @@ def clean():
                 print attachment
                 local("aws ec2 detach-internet-gateway --internet-gateway-id "+internet_gateway['InternetGatewayId']+" --vpc-id "+attachment['VpcId'])
                 local("aws ec2 delete-internet-gateway --internet-gateway-id "+internet_gateway['InternetGatewayId'])
-                project_yaml['web']['aws']['internet_gateway_id'] = None
     else:
         print "No InternetGateways"
 
@@ -391,7 +389,6 @@ def clean():
         for subnet in json.loads(subnets):
             print subnet
             local("aws ec2 delete-subnet --subnet-id "+subnet['SubnetId'])
-            project_yaml['web']['aws']['subnet_id'] = None
     else:
         print "No Subnets"
 
@@ -401,20 +398,22 @@ def clean():
             print route_table
             if len(route_table['Associations']) < 1:
                 local("aws ec2 delete-route-table --route-table-id "+route_table['RouteTableId'])
-                project_yaml['web']['aws']['route_table_id'] = None
     else:
         print "No RouteTables"
 
     vpc = local("aws ec2 describe-vpcs --filters Name=vpc-id,Values="+vpc_id+" --output json --query 'Vpcs[]'", capture=True)
     if vpc != "":
         local("aws ec2 delete-vpc --vpc-id "+vpc_id)
-        project_yaml['web']['aws']['vpc_id'] = None
     else:
         print "No Vpc"
 
     #
     # Update YAML
     #
+
+    project_yaml.pop('web', None)
+    project_yaml.pop('aws', None)
+    project_yaml.pop('git', None)
 
     new_project_yaml = ruamel.yaml.dump(project_yaml, Dumper=ruamel.yaml.RoundTripDumper)
 

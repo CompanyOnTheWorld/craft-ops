@@ -65,6 +65,7 @@ craft/storage/*
 license.key
 
 # Craft Ops
+private.conf
 .vagrant/machines/dev
 .vagrant/machines/basebox
 package.box

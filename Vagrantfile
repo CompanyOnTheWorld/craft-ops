@@ -78,16 +78,16 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     web.vm.box_url = $project['web']['vagrant']['box_url']
 
     web.vm.provider :aws do |aws, override|
-      aws.access_key_id = $project['aws_access_key']
-      aws.secret_access_key = $project['aws_secret_key']
+      aws.access_key_id = $project['aws']['access_key']
+      aws.secret_access_key = $project['aws']['secret_key']
 
-      aws.ami = $project['web']['aws']['ami_id']
+      aws.ami = $project['aws']['ami_id']
       aws.keypair_name = $project['name']
-      aws.region = $project['web']['aws']['region']
-      aws.instance_type = $project['web']['aws']['instance_type']
-      aws.elastic_ip = $project['web']['aws']['elastic_ip']
-      aws.security_groups = $project['web']['aws']['security_groups']
-      aws.subnet_id = $project['web']['aws']['subnet_id']
+      aws.region = $project['aws']['region']
+      aws.instance_type = $project['aws']['instance_type']
+      aws.elastic_ip = $project['aws']['elastic_ip']
+      aws.security_groups = $project['aws']['security_groups']
+      aws.subnet_id = $project['aws']['subnet_id']
       aws.associate_public_ip = true
       aws.tags = {
         'Roles' => 'web',

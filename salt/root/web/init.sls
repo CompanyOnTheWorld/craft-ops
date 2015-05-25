@@ -40,8 +40,8 @@ install_composer:
 
 {% set stages = project['web']['stages'] %}
 
-{% set aws_access_key = project['aws_access_key'] -%}
-{% set aws_secret_key = project['aws_secret_key'] -%}
+{% set aws_access_key = project['aws']['access_key'] -%}
+{% set aws_secret_key = project['aws']['secret_key'] -%}
 
 {% for stage in stages %}
 
@@ -201,14 +201,11 @@ install_composer:
       mysql_user: {{ mysql_user }}
       mysql_pass: {{ mysql_pass }}
       mysql_db: {{ mysql_db }}
+      {% if aws_access_key %}
       aws_access_key: {{ aws_access_key }}
       aws_secret_key: {{ aws_secret_key }}
+      {% endif %}
       uploads_path: {{ uploads_path }}
       craft_path: {{ craft_path }}
-
-#   Get public key from private key:
-#
-#   $ ssh-keygen -f web.pem -y > web.pub
-#
 
 {% endfor %}

@@ -12,10 +12,10 @@
 {% set project = pillar -%}
 
 {% set project_name = project['name'] -%}
-{% set aws_access_key = project['aws_access_key'] -%}
-{% set aws_secret_key = project['aws_secret_key'] -%}
-{% set bitbucket_user = project['bitbucket_user'] -%}
-{% set bitbucket_pass_token = project['bitbucket_pass_token'] -%}
+{% set aws_access_key = project['aws']['access_key'] -%}
+{% set aws_secret_key = project['aws']['secret_key'] -%}
+{% set bitbucket_user = project['bitbucket']['user'] -%}
+{% set bitbucket_pass_token = project['bitbucket']['token'] -%}
 
 {% set user = project['dev']['user'] -%}
 {% set group = project['dev']['group'] -%}
