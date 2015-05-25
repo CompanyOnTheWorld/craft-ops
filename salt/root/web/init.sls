@@ -108,25 +108,31 @@ install_composer:
 
 {{ mysql_user_db(mysql_user, mysql_pass, mysql_db) }}
 
-{% if project['web']['server_name'] is not none  %}
+{% if project['web']['server_name'] %}
   {% set web_server_name = project['web']['server_name'] if (stage == "production") else stage+'.'+project['web']['server_name'] -%}
-
-  {% if stages[stage]['server_name'] is not none %}
-    {% set server_name = stages[stage]['server_name'] + " " + web_server_name %}
-  {% else %}
-    {% set server_name = web_server_name %}
-  {% endif %}
-
 {% else %}
-  {% set server_name = project_name -%}
+  {% set web_server_name = '_' if (stage == "production") else '' -%}
+{% endif %}
+
+{% if stages[stage]['server_name'] %}
+  {% set server_name = stages[stage]['server_name'] + " " + web_server_name %}
+{% else %}
+  {% set server_name = web_server_name %}
+{% endif %}
+
+{% if stage == 'production' %}
+  {% set default_server = True %}
+{% else %}
+  {% set default_server = False %}
 {% endif %}
 
 {{ nginxsite(user, group,
              project_path=project_path,
              name=project_name,
              server_name=server_name,
+             default_server=default_server,
              template="salt://web/files/craft-cms.conf",
-             root="current/public",
+             root="public",
              cors="*",
              defaults={
                 'port': port
