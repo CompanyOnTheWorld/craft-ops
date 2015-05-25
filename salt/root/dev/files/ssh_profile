@@ -18,6 +18,6 @@ export BITBUCKET_PASS_TOKEN={{ bitbucket_pass_token }}
 {% endif %}
 export UPLOADS_PATH={{ uploads_path }}
 export CRAFT_PATH={{ craft_path }}
-ssh-add {{ project_path }}/salt/web/root/files/web.pem
+ssh-add {{ project_path }}/salt/root/web/files/web.pem
 
 source ~/.bashrc

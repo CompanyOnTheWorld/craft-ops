@@ -74,6 +74,7 @@ install_composer:
 
 {{ deploy(user, group,
           repo=repo,
+          remote_name='bitbucket',
           identity=home+'/.ssh/web.pem')
 }}
 

@@ -1,4 +1,3 @@
-cd {{ project_path }}
 export PROJECT_PATH={{ project_path }}
 export CRAFT_PATH={{ craft_path }}
 source ~/.nvm/nvm.sh
