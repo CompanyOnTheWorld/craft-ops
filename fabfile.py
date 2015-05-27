@@ -189,22 +189,22 @@ def db(method):
 
         if method == "import":
             if env.host == "localhost":
-                local("cd /tmp && mysql -u $MYSQL_USER -h $MYSQL_HOST -p$MYSQL_PASS $MYSQL_DB < dump.sql")
+                local("cd /tmp && mysql -u $MYSQL_USER -h localhost -p$MYSQL_PASS $MYSQL_DB < dump.sql")
             else:
-                run("cd $HOME/tmp && mysql -u $MYSQL_USER -h $MYSQL_HOST -p$MYSQL_PASS $MYSQL_DB < import.sql")
+                run("cd $HOME/tmp && mysql -u $MYSQL_USER -h localhost -p$MYSQL_PASS $MYSQL_DB < import.sql")
         if method == "dump":
             if env.host == "localhost":
-                local("cd /tmp && mysqldump -u $MYSQL_USER -h $MYSQL_HOST -p$MYSQL_PASS $MYSQL_DB > dump.sql")
+                local("cd /tmp && mysqldump -u $MYSQL_USER -h localhost -p$MYSQL_PASS $MYSQL_DB > dump.sql")
             else:
-                run("cd $HOME/tmp && mysqldump -u $MYSQL_USER -h $MYSQL_HOST -p$MYSQL_PASS $MYSQL_DB > dump.sql")
+                run("cd $HOME/tmp && mysqldump -u $MYSQL_USER -h localhost -p$MYSQL_PASS $MYSQL_DB > dump.sql")
         if method == "down":
-            get("$HOME/tmp/dump.sql","/tmp/dump.sql")
+            get("/home/"+stage.user+"/tmp/dump.sql","/tmp/dump.sql")
         if method == "up":
-            put("/tmp/dump.sql","$HOME/tmp/import.sql")
+            put("/tmp/dump.sql","/home/"+stage.user+"/tmp/import.sql")
         if method == "sync":
-            run("cd $HOME/tmp && mysqldump -u $MYSQL_USER -h $MYSQL_HOST -p$MYSQL_PASS $MYSQL_DB > dump.sql")
-            get("$HOME/tmp/dump.sql","/tmp/dump.sql")
-            local("cd /tmp && mysql -u $MYSQL_USER -h $MYSQL_HOST -p$MYSQL_PASS $MYSQL_DB < dump.sql")
+            run("cd $HOME/tmp && mysqldump -u $MYSQL_USER -h localhost -p$MYSQL_PASS $MYSQL_DB > dump.sql")
+            get("/home/"+stage.user+"/tmp/dump.sql","/tmp/dump.sql")
+            local("cd /tmp && mysql -u $MYSQL_USER -h localhost -p$MYSQL_PASS $MYSQL_DB < dump.sql")
             
 
 
