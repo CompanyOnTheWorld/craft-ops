@@ -133,6 +133,7 @@ install_composer:
              default_server=default_server,
              template="salt://web/files/craft-cms.conf",
              root="public",
+             static=project_path+"/public/static",
              cors="*",
              defaults={
                 'port': port
