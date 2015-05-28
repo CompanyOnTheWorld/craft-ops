@@ -64,11 +64,9 @@ object is created by merging a series of YAML files on top of each other.
 
 `project.conf` - This is the main file where you should put custom properties.
 
-`private.conf` (optional) - This file is where you would store private project
-data like access keys. You should `.gitignore` this file or encrypt it if you do
-use it.
-
-`~/ops.conf` (optional) - 
+`private.conf` (generated) - This file is where you would store private project
+data like access keys. You should `.gitignore` this file or encrypt it if you
+want to share it in the repo.
 
 #### Global config
 
