@@ -53,8 +53,40 @@ host system's `$HOME` directory when the `dev` box is provisioned. You can keep
 access keys here if you need them for all projects. You will need to run
 `vagrant provision dev` if you change this file.
 
+#### AWS
+
+After you have setup your AWS account you will need to create a new user
+under [IAM][aws_iam_link].  As soon as you create this user you will be given
+two keys. Create a file called `private.conf` at the root of the project
+and add the values in this format...
+
+```
+aws:
+  access_key: This is the short one
+  secret_key: This is the long one
+```
+
+You will also need to attach an **Administrator Policy** to the user. After this you
+will never need to log into AWS again.
+
+#### Bitbucket
+
+The best way to handle bitbucket is to create a "team" for your repositories to live
+under.  With teams Bitbucket allows you to generate an "API key" to use instead of your
+password.  You can generate this token under "Manage team" in the top right corner.
+Once you have this token you can add two more values to `private.conf`...
+
+```
+bitbucket:
+  user: The name of the team
+  token: The API key from the team management page
+```
+
+> Keep in mind that YAML is whitespace sensitive and your tabs must all be the same.
+
 ####
 
+[aws_iam_link]: https://console.aws.amazon.com/iam/
 [craft_link]: https://buildwithcraft.com/
 [craft_license]: https://buildwithcraft.com/license
 [project_conf_link]: https://github.com/stackstrap/craft-ops/blob/master/project.conf#L3
