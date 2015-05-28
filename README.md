@@ -35,23 +35,7 @@ You can then hit the dev server at `http://localhost:8000`
 
 ## Setting up the rest...
 
-#### How the configuration works
 
-The ops setup is configured by sourcing data from a configuration object. The
-object is created by merging a series of YAML files on top of each other.
-
-`defaults.conf` - This file is the base layer and just for reference.
-
-`project.conf` - This is the main file where you should put custom properties.
-
-`private.conf` (optional) - This file is where you would store private project
-data like access keys. You should `.gitignore` this file or encrypt it if you do
-use it.
-
-`~/ops.conf` (optional) - This is a global config file that is pulled in from your
-host system's `$HOME` directory when the `dev` box is provisioned. You can keep 
-access keys here if you need them for all projects. You will need to run
-`vagrant provision dev` if you change this file.
 
 #### Getting AWS credentials
 
@@ -71,11 +55,29 @@ under.  With teams Bitbucket allows you to generate an "API key" to use instead 
 password.  You can generate this token under "Manage team" in the top right corner.
 Make sure you have this key handy along with the name of the team you created.
 
+#### How the configuration works
+
+The ops setup is configured by sourcing data from a configuration object. The
+object is created by merging a series of YAML files on top of each other.
+
+`defaults.conf` - This file is the base layer and just for reference.
+
+`project.conf` - This is the main file where you should put custom properties.
+
+`private.conf` (optional) - This file is where you would store private project
+data like access keys. You should `.gitignore` this file or encrypt it if you do
+use it.
+
+`~/ops.conf` (optional) - 
+
 #### Global config
 
-If you would like to use the same credentials for all projects you can keep all of the
-above information in `~/ops.conf` on your host machine.  This will allow you to kick off
-a new Craft Ops project without having to complete these steps each time.
+If you would like to use the same credentials for all projects, you can keep all of the
+above information in `~/ops.conf` on your host machine. This is a global config file
+that is pulled in from your host system's `$HOME` directory when the `dev` box is
+provisioned. You can keep access keys here if you need them for all projects. You
+will need to run `vagrant provision dev` if you change this file. This will allow you
+to kick off a new Craft Ops project without having to get credentials each time.
 
 ####
 
