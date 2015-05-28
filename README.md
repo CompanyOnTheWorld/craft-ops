@@ -84,6 +84,12 @@ bitbucket:
 
 > Keep in mind that YAML is whitespace sensitive and your tabs must all be the same.
 
+#### Global config
+
+If you would like to use the same credentials for all projects you can keep all of the
+above information in `~/ops.conf` on your host machine.  This will allow you to kick off
+a new Craft Ops project without having to complete these steps each time.
+
 ####
 
 [aws_iam_link]: https://console.aws.amazon.com/iam/
