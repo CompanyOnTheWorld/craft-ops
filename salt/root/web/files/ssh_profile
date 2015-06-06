@@ -1,6 +1,5 @@
 export PROJECT_PATH={{ project_path }}
 export CRAFT_PATH={{ craft_path }}
-source ~/.nvm/nvm.sh
 export GIT_EDITOR=vim
 export SASS_LIBSASS_PATH="/usr/local/lib/libsass"
 export CRAFT_ENVIRONMENT={{ stage }}

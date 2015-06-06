@@ -1,6 +1,4 @@
 cd {{ project_path }}
-source ~/.nvm/nvm.sh
-source ~/virtualenv/bin/activate
 export GIT_EDITOR=vim
 export SASS_LIBSASS_PATH="/usr/local/lib/libsass"
 export AWS_ACCESS_KEY={{ aws_access_key }}

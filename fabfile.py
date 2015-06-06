@@ -148,6 +148,7 @@ def deploy(branch="master"):
         run("rm -rf $CRAFT_PATH/storage")
         run("ln -s $HOME/shared/storage $CRAFT_PATH/storage")
 
+        run("cd $HOME/current && bower install")
         run("harp compile $HOME/current/assets $HOME/shared/static")
 
 

@@ -16,24 +16,11 @@ php5-restart:
     - require:
       - cmd: php-mcrypt-enable
 
-install_composer:
-  cmd:
-    - run
-    - name: curl -sS https://getcomposer.org/installer | php -- --install-dir=/opt
-    - unless: test -e /opt/composer.phar
-    - require:
-      - pkg: php5-fpm
-
-/usr/local/bin/composer:
-  file.symlink:
-    - target: /opt/composer.phar
-
 {% from "stackstrap/env/macros.sls" import env -%}
 {% from "stackstrap/deploy/macros.sls" import deploy %}
 {% from "stackstrap/nginx/macros.sls" import nginxsite %}
 {% from "stackstrap/php5/macros.sls" import php5_fpm_instance %}
 {% from "stackstrap/mysql/macros.sls" import mysql_user_db %}
-{% from "stackstrap/nvmnode/macros.sls" import nvmnode %}
 
 {% set project = pillar -%}
 {% set project_name = project['name'] %}
@@ -77,21 +64,6 @@ install_composer:
           remote_name='bitbucket',
           identity=home+'/.ssh/web.pem')
 }}
-
-{{ nvmnode(user, group,
-           ignore_package_json=True,
-           node_globals=['bower', 'grunt', 'node-sass', 'harp']) 
-}}
-
-{{ user }}_install_harp:
-  cmd.run:
-    - name: /bin/bash -c "source ~/.nvm/nvm.sh; npm install -g harp"
-    - user: {{ user }}
-    - unless: /bin/bash -c "source ~/.nvm/nvm.sh; npm -g ls harp | grep harp"
-    - check_cmd:
-      - /bin/true
-    - require:
-      - cmd: {{ user }}_install_node
 
 {{ php5_fpm_instance(user, group, port,
                      name=project_name,
@@ -172,7 +144,7 @@ install_composer:
   archive.extracted:
     - name: {{ home }}/shared/vendor
     - source: https://github.com/pixelandtonic/Craft-Release/archive/master.tar.gz 
-    - source_hash: md5=0cf267bac9a021a4adcbf983dfd0f8ef
+    - source_hash: md5=29acdf188d865e0b7e44e7144e68bcef
     - archive_format: tar
     - archive_user: {{ home }}
     - if_missing: {{ home }}/shared/vendor/Craft-Release-master

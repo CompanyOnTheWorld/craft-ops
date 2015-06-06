@@ -1,12 +1,7 @@
 # -*- mode: yaml -*-
-# vim: set ft=ruby ts=2 sw=2 et sts=2 :
-
-include:
-  - stackstrap.env
-  - stackstrap.virtualenv
+# vim: set ft=yaml ts=2 sw=2 et sts=2 :
 
 {% from "stackstrap/env/macros.sls" import env -%}
-{% from "stackstrap/nvmnode/macros.sls" import nvmnode %}
 
 {% set project = pillar -%}
 {% set project_name = project['name'] -%}
@@ -16,7 +11,6 @@ include:
 
 {% set home = "/home/"+user -%}
 {% set project_path = "/project" -%}
-{% set virtualenv = home+"/virtualenv" -%}
 
 {% set aws_access_key = project['aws']['access_key'] -%}
 {% set aws_secret_key = project['aws']['secret_key'] -%}
@@ -25,40 +19,10 @@ include:
 
 {{ env(user, group) }}
 
-{{ nvmnode(user, group,
-           ignore_package_json=True,
-           node_globals=['bower', 'grunt', 'node-sass', 'harp']) 
-}}
-
-{{ user }}_install_harp:
-  cmd.run:
-    - name: /bin/bash -c "source ~/.nvm/nvm.sh; npm install -g harp"
-    - user: {{ user }}
-    - unless: /bin/bash -c "source ~/.nvm/nvm.sh; npm -g ls harp | grep harp"
-    - check_cmd:
-      - /bin/true
-    - require:
-      - cmd: {{ user }}_install_node
-
-admin_virtualenv:
+python_requirements:
   cmd:
     - run
-    - name: "virtualenv {{ virtualenv }} && rm -f {{ virtualenv }}/lib*/*/no-global-site-packages.txt"
-    - unless: "test -d {{ virtualenv }}"
-    - user: {{ user }}
-    - require:
-      - pkg: virtualenv_pkgs
-
-admin_requirements:
-  cmd:
-    - run
-    - name: "source {{ virtualenv }}/bin/activate; pip install -r {{ project_path }}/salt/root/web/files/requirements.txt"
-    - shell: /bin/bash
-    - env:
-        SHORT_NAME: {{ project_name }}
-    - user: {{ user }}
-    - require:
-      - cmd: admin_virtualenv
+    - name: "pip install -r {{ project_path }}/salt/root/web/files/requirements.txt"
 
 admin_private_key:
   file.managed:

@@ -42,7 +42,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
     dev.vm.provision :salt do |salt|
       salt.install_type = "git"
-      salt.install_args = "v2015.5.0"
+      salt.install_args = "v2015.5.1"
       salt.minion_config = "salt/config/dev.conf"
       salt.pillar($project)
       salt.run_highstate = true
@@ -147,7 +147,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
     basebox.vm.provision :salt do |salt|
       salt.install_type = "git"
-      salt.install_args = "v2015.5.0"
+      salt.install_args = "v2015.5.1"
       salt.minion_config = "salt/config/basebox.conf"
       salt.run_highstate = false
     end

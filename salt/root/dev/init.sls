@@ -6,8 +6,6 @@
 {% from "stackstrap/php5/macros.sls" import php5_fpm_instance %}
 {% from "stackstrap/mysql/macros.sls" import mysql_user_db %}
 {% from "stackstrap/env/macros.sls" import env %}
-{% from "stackstrap/rvmruby/macros.sls" import rvmruby %}
-{% from "stackstrap/nvmnode/macros.sls" import nvmnode %}
 
 {% set project = pillar -%}
 
@@ -20,8 +18,8 @@
 {% set user = project['dev']['user'] -%}
 {% set group = project['dev']['group'] -%}
 {% set home = "/home/" + user -%}
-{% set virtualenv = home + "/virtualenv" -%}
 {% set project_path = project['dev']['path'] -%}
+{% set assets_path = project['dev']['path'] + "/assets" -%}
 
 {% set git_repo = project['git']['repo'] %}
 {% set git_email = project['git']['email'] %}
@@ -34,7 +32,8 @@
 {{ mysql_user_db(mysql_user, mysql_pass) }}
 
 {% set uploads_path = project_path + "/public/assets" -%}
-{% set craft_path = project_path + "/vendor/Craft-Release-master" -%}
+{% set php_vendor_path = home + "/vendor" -%}
+{% set craft_path = php_vendor_path + "/Craft-Release-master" -%}
 
 {{ user }}_mysql_import:
   cmd.run:
@@ -56,32 +55,10 @@
     - present
     - user: {{ user }}
 
-{{ user }}_virtualenv:
+python_requirements:
   cmd:
     - run
-    - name: "virtualenv {{ virtualenv }} && rm -f {{ virtualenv }}/lib*/*/no-global-site-packages.txt"
-    - unless: "test -d {{ virtualenv }}"
-    - user: vagrant
-    - require:
-      - pkg: virtualenv_pkgs
-
-{{ user }}_requirements:
-  cmd:
-    - run
-    - name: "source {{ virtualenv }}/bin/activate; pip install -r {{ project_path }}/salt/root/dev/files/requirements.txt"
-    - shell: /bin/bash
-    - user: vagrant
-    - require:
-      - cmd: {{ user }}_virtualenv
-
-{{ rvmruby(user, group,
-           rvm_globals=['filewatcher']) 
-}}
-
-{{ nvmnode(user, group,
-           ignore_package_json=True,
-           node_globals=['bower', 'harp']) 
-}}
+    - name: "pip install -r {{ project_path }}/salt/root/dev/files/requirements.txt"
   
 {{ php5_fpm_instance(user, group, '5000',
                      envs={
@@ -100,12 +77,18 @@
 	           root="public",
              listen="8000",
              server_name="_",
-             static=project_path+"/public/static",
              cors="*",
              defaults={
                 'port': '5000'
              })
 }}
+
+{{ php_vendor_path }}:
+  file.directory:
+    - user: {{ user }}
+    - group: {{ group }}
+    - mode: 755
+    - makedirs: True
 
 {{ project_path }}/craft/plugins:
   file.directory:
@@ -121,34 +104,11 @@
     - mode: 755
     - makedirs: True
 
-{{ project_path }}/vendor:
-  file.directory:
-    - user: {{ user }}
-    - group: {{ group }}
-    - mode: 755
-    - makedirs: True
-
-download_craft_guzzle_plugin:
-  archive.extracted:
-    - name: {{ project_path }}/vendor
-    - source: https://github.com/davist11/craft-guzzle/archive/master.tar.gz 
-    - source_hash: md5=8758bcc8e33ba59dacca7c3ead7a31eb
-    - archive_format: tar
-    - user: {{ user }}
-    - group: {{ group }}
-    - if_missing: {{ project_path }}/vendor/craft-guzzle-master
-
-{{ project_path }}/craft/plugins/guzzle:
-  file.symlink:
-    - user: {{ user }}
-    - group: {{ group }}
-    - target: {{ project_path }}/vendor/craft-guzzle-master/guzzle
-
 download_craft:
   archive.extracted:
-    - name: {{ project_path }}/vendor
+    - name: {{ php_vendor_path }}
     - source: https://github.com/pixelandtonic/Craft-Release/archive/master.tar.gz 
-    - source_hash: md5=0cf267bac9a021a4adcbf983dfd0f8ef
+    - source_hash: md5=29acdf188d865e0b7e44e7144e68bcef
     - archive_format: tar
     - user: {{ user }}
     - group: {{ group }}
@@ -187,29 +147,21 @@ download_craft:
     - group: {{ group }}
     - target: {{ project_path }}/templates
 
-remove-nginx-default-conf:
-  file:
-    - absent
-    - names:
-      - /etc/nginx/sites-enabled/default
-      - /etc/nginx/sites-available/default
-    - require:
-      - pkg: nginx
-    - watch_in:
-      - service: nginx
-
-install_composer:
-  cmd:
-    - run
-    - name: curl -sS https://getcomposer.org/installer | php
+download_craft_guzzle_plugin:
+  archive.extracted:
+    - name: {{ php_vendor_path }}
+    - source: https://github.com/davist11/craft-guzzle/archive/master.tar.gz 
+    - source_hash: md5=8758bcc8e33ba59dacca7c3ead7a31eb
+    - archive_format: tar
     - user: {{ user }}
-    - unless: test -e {{ home }}/composer.phar
-    - require:
-      - pkg: php5-fpm
+    - group: {{ group }}
+    - if_missing: {{ php_vendor_path }}/craft-guzzle-master
 
-/usr/local/bin/composer:
+{{ project_path }}/craft/plugins/guzzle:
   file.symlink:
-    - target: {{ home }}/composer.phar
+    - user: {{ user }}
+    - group: {{ group }}
+    - target: {{ php_vendor_path }}/craft-guzzle-master/guzzle
 
 php5-mcrypt:
   pkg.installed
@@ -260,9 +212,9 @@ install_vagrant_aws:
       - pkg: install_vagrant
 
 {{ supervise("dev", home, user, group, {
-        "watcher": {
-            "command": "\"filewatcher '**/*.*' 'harp compile "+project_path+"/assets "+project_path+"/public/static'\"",
-            "directory": project_path,
+        "harp": {
+            "command": "harp server",
+            "directory": assets_path,
             "user": user
         }
     })
@@ -277,8 +229,14 @@ install_vagrant_aws:
     - template: jinja
     - require:
       - user: {{ user }}
-    - defaults:
-      project_path: {{ project_path }}
+
+install_bower_components:
+  cmd.run:
+    - name: bower install
+    - cwd: {{ project_path }}
+    - user: {{ user }}
+    - require:
+      - file: {{ user }}_bowerrc
 
 {{ user }}_git_config:
   file.managed:
