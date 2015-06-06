@@ -148,7 +148,7 @@ download_craft:
   archive.extracted:
     - name: {{ project_path }}/vendor
     - source: https://github.com/pixelandtonic/Craft-Release/archive/master.tar.gz 
-    - source_hash: md5=0cf267bac9a021a4adcbf983dfd0f8ef
+    - source_hash: md5=29acdf188d865e0b7e44e7144e68bcef
     - archive_format: tar
     - user: {{ user }}
     - group: {{ group }}
