@@ -50,7 +50,7 @@ it will just work.
 You can add all of your bower components to the `bower.json` file at the root of the
 project.  Just run `bower install` within the `dev` vm (`vagrant ssh dev`) and these
 assets will end up being output to  `assets/vendor` and therefore available at
-`http://localhost:8000/static`.
+`http://localhost:8000/static/vendor`.
 
 # Completing the Ops setup
 
