@@ -94,10 +94,18 @@ under.  With teams Bitbucket allows you to generate an "API key" to use instead 
 password.  You can generate this token under "Manage team" in the top right corner.
 Make sure you have this key handy along with the name of the team you created.
 
-#### Using the keys
+#### Updating the config
 
-Once you have your AWS and bitbucket keys you can put those values in any of the above
-mentioned YAML files...
+First off you will need to set your project's `name` in `project.conf`.  This value
+will be used to name system related things, so leave out special characters.
+
+```
+name: project_name
+```
+
+Once you have your AWS and bitbucket keys you can put those values in the appropriate
+YAML file. Technically you can put them in any one, but creating a `private.conf` or
+`~/ops.conf` is your best best.
 
 ```
 aws:
@@ -105,7 +113,7 @@ aws:
   secret_key: dsjaf3jk4jl5kj9fjej3l3404353jlgjaglh303
   
 bitbucket:
-  user: username 
+  user: teamname 
   token: dsafdsfjdks93kjfaj2oj23kjfkjandfk
 ```
 
@@ -114,19 +122,19 @@ bitbucket:
 Make sure you are in the `dev` vm
 
 ```
-vagrant ssh dev
+$ vagrant ssh dev
 ```
 
 Run the `fab` command to ready your project on Bitbucket and AWS
 
 ```
-fab setup
+$ fab setup
 ```
 
 Then `up` the `web` vm to build it
 
 ```
-vagrant up web
+$ vagrant up web
 ```
 
 [harp_link]: http://harpjs.com/
