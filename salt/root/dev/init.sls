@@ -37,7 +37,7 @@
 
 {{ user }}_mysql_import:
   cmd.run:
-    - name: unzip -p {{ project_path }}/salt/dev/root/files/craft-cms-backup.zip | mysql -u {{ mysql_user }} -p{{ mysql_pass }} {{ mysql_user }}
+    - name: unzip -p {{ project_path }}/salt/root/dev/files/craft-cms-backup.zip | mysql -u {{ mysql_user }} -p{{ mysql_pass }} {{ mysql_user }}
 
 {{ env(user, group) }}
 
