@@ -33,27 +33,7 @@ $ vagrant up dev
 
 You can then hit the dev server at `http://localhost:8000`
 
-## Setting up the rest...
-
-
-
-#### Getting AWS credentials
-
-After you have setup your AWS account you will need to create a new user
-under [IAM][aws_iam_link].  As soon as you create this user you will be given
-two keys. Download this information and save it somewhere as it will not be
-available again.
-
-You will also need to attach an **Administrator Policy** to the user. You can do this
-by clicking the user and going to it's full edit view. After this you will never need
-to log into AWS again.
-
-#### Getting Bitbucket credentials
-
-The best way to handle bitbucket is to create a "team" for your repositories to live
-under.  With teams Bitbucket allows you to generate an "API key" to use instead of your
-password.  You can generate this token under "Manage team" in the top right corner.
-Make sure you have this key handy along with the name of the team you created.
+# Completing the Ops setup
 
 #### How the configuration works
 
@@ -77,7 +57,52 @@ provisioned. You can keep access keys here if you need them for all projects. Yo
 will need to run `vagrant provision dev` if you change this file. This will allow you
 to kick off a new Craft Ops project without having to get credentials each time.
 
-####
+##### Getting AWS credentials
+
+After you have setup your AWS account you will need to create a new user
+under [IAM][aws_iam_link].  As soon as you create this user you will be given
+two keys. Download this information and save it somewhere as it will not be
+available again.
+
+You will also need to attach an **Administrator Policy** to the user. You can do this
+by clicking the user and going to it's full edit view. After this you will never need
+to log into AWS again.
+
+##### Getting Bitbucket credentials
+
+The best way to handle bitbucket is to create a "team" for your repositories to live
+under.  With teams Bitbucket allows you to generate an "API key" to use instead of your
+password.  You can generate this token under "Manage team" in the top right corner.
+Make sure you have this key handy along with the name of the team you created.
+
+#### Using the keys
+
+Once you have your AWS and bitbucket keys you can put those values in any of the above
+mentioned YAML files...
+
+```
+aws:
+  access_key: AJALDFJFNENNNKFDABKDBFE
+  secret_key: dsjaf3jk4jl5kj9fjej3l3404353jlgjaglh303
+  
+bitbucket:
+  user: username 
+  token: dsafdsfjdks93kjfaj2oj23kjfkjandfk
+```
+
+#### The final step
+
+First run the `fab` command to ready your project on Bitbucket and AWS
+
+```
+fab setup
+```
+
+Then `up` the `web` vm to build it
+
+```
+vagrant up web
+```
 
 [aws_iam_link]: https://console.aws.amazon.com/iam/
 [craft_link]: https://buildwithcraft.com/
