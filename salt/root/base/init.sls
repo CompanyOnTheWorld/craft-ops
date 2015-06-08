@@ -63,6 +63,7 @@ install_composer:
 move_composer:
   cmd.run:
     - name: mv composer.phar /usr/local/bin/composer
+    - unless: test -e /usr/local/bin/composer
     - cwd: /tmp
     - require:
       - cmd: install_composer
