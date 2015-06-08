@@ -114,19 +114,19 @@ bitbucket:
 Make sure you are in the `dev` vm
 
 ```
-vagrant ssh dev
+$ vagrant ssh dev
 ```
 
 Run the `fab` command to ready your project on Bitbucket and AWS
 
 ```
-fab setup
+$ fab setup
 ```
 
 Then `up` the `web` vm to build it
 
 ```
-vagrant up web
+$ vagrant up web
 ```
 
 [harp_link]: http://harpjs.com/
