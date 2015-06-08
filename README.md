@@ -105,7 +105,7 @@ aws:
   secret_key: dsjaf3jk4jl5kj9fjej3l3404353jlgjaglh303
   
 bitbucket:
-  user: username 
+  user: teamname 
   token: dsafdsfjdks93kjfaj2oj23kjfkjandfk
 ```
 
