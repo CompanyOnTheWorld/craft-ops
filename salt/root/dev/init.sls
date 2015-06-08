@@ -37,7 +37,8 @@
 
 {{ user }}_mysql_import:
   cmd.run:
-    - name: unzip -p {{ project_path }}/salt/root/dev/files/craft-cms-backup.zip | mysql -u {{ mysql_user }} -p{{ mysql_pass }} {{ mysql_user }}
+    - name: unzip -p {{ project_path }}/salt/root/dev/files/craft-cms-backup.zip | mysql -u {{ mysql_user }} -p{{ mysql_pass }} {{ mysql_db }}
+    - unless: mysql -u {{ mysql_user }} -p{{ mysql_pass }} {{ mysql_db }} -e "SHOW TABLES LIKE 'craft_info'" | grep 'craft_info'
 
 {{ env(user, group) }}
 
@@ -84,6 +85,13 @@ python_requirements:
 }}
 
 {{ php_vendor_path }}:
+  file.directory:
+    - user: {{ user }}
+    - group: {{ group }}
+    - mode: 755
+    - makedirs: True
+
+{{ uploads_path }}:
   file.directory:
     - user: {{ user }}
     - group: {{ group }}
