@@ -92,7 +92,13 @@ bitbucket:
 
 #### The final step
 
-First run the `fab` command to ready your project on Bitbucket and AWS
+Make sure you are in the `dev` vm
+
+```
+vagrant ssh dev
+```
+
+Run the `fab` command to ready your project on Bitbucket and AWS
 
 ```
 fab setup
