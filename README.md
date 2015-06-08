@@ -33,6 +33,24 @@ $ vagrant up dev
 
 You can then hit the dev server at `http://localhost:8000`
 
+### Asset pipline
+
+##### Harp
+
+The Craft Ops `dev` vm runs the [Harp][harp_link] static webserver locally and uses
+nginx to proxy it's output to `http://localhost:8000/static`. Any file within the
+`assets` folder will be served up at this location and parsed accordingly.
+This will allow you to write pure SASS or CoffeeScript without the need to fiddle
+with various Grunt or Gulp configurations.  Harp is designed with a convention vs
+configuration philosophy, so as long as you understand how to layout your files
+it will just work.
+
+##### Bower
+
+You can add all of your bower components to the `bower.json` file at the root of the
+project.  Just run `bower install` and these assets will end up being output to 
+`assets/vendor` and therefore available at `http://localhost:8000/static`.
+
 # Completing the Ops setup
 
 #### How the configuration works
@@ -110,6 +128,7 @@ Then `up` the `web` vm to build it
 vagrant up web
 ```
 
+[harp_link]: http://harpjs.com/
 [aws_iam_link]: https://console.aws.amazon.com/iam/
 [craft_link]: https://buildwithcraft.com/
 [craft_license]: https://buildwithcraft.com/license
