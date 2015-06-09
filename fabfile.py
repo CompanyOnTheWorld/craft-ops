@@ -158,12 +158,11 @@ def uploads(method):
     for current_stage in env.stages:
         stage = bunchify(stages[current_stage])
         env.user = stage.user
-        dev = bunchify(stages["dev"])
 
         if method == "up":
-            local("rsync -avz --progress "+os.environ['UPLOADS_PATH']+"/ "+env.user+"@"+env.host_string+":$UPLOADS_PATH")
+            local("rsync -avz --progress "+os.environ['UPLOADS_PATH']+"/ "+env.user+"@"+env.host_string+":/home/"+env.user+"/shared/assets")
         if method == "down":
-            local("rsync -avz --progress "+env.user+"@"+env.host_string+":$UPLOADS_PATH/ "+os.environ['UPLOADS_PATH'])
+            local("rsync -avz --progress "+env.user+"@"+env.host_string+":/home/"+env.user+"/shared/assets/ "+os.environ['UPLOADS_PATH'])
 
 
 @task
