@@ -78,6 +78,9 @@ provisioned. You can keep access keys here if you need them for all projects. Yo
 will need to run `vagrant provision dev` if you change this file. This will allow you
 to kick off a new Craft Ops project without having to get credentials each time.
 
+> For example you may want to keep your Bitbucket creds in the global config and
+> keep individual AWS creds in private.conf for each project or client.
+
 ##### Getting AWS credentials
 
 After you have setup your AWS account you will need to create a new user
