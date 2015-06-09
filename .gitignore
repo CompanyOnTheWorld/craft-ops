@@ -72,5 +72,5 @@ package.box
 vendor
 *.pem
 *.pub
-public/static/*
+public/assets/*
 salt/web/root/files/authorized_keys
