@@ -1,9 +1,9 @@
 awscli
 bitbucket-api
-bitbucket-cli
 boto
 bunch
 fabric
+https://github.com/kennethreitz/legit/zipball/master
 pprintpp
 pyyaml
 requests

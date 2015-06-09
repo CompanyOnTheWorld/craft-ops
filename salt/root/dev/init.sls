@@ -35,6 +35,23 @@
 {% set php_vendor_path = home + "/vendor" -%}
 {% set craft_path = php_vendor_path + "/Craft-Release-master" -%}
 
+python_requirements:
+  pip.installed:
+    - requirements: salt://dev/files/requirements.txt
+
+configure_legit_aliases:
+  cmd.run:
+    - name: legit install
+    - require:
+      - pip: python_requirements
+
+configure_legit_remote:
+  cmd.run:
+    - name: git config legit.remote bitbucket
+    - cwd: {{ project_path }}
+    - require:
+      - pip: python_requirements
+
 {{ user }}_mysql_import:
   cmd.run:
     - name: unzip -p {{ project_path }}/salt/root/dev/files/craft-cms-backup.zip | mysql -u {{ mysql_user }} -p{{ mysql_pass }} {{ mysql_db }}
@@ -55,11 +72,6 @@
     - name: bitbucket.org
     - present
     - user: {{ user }}
-
-python_requirements:
-  cmd:
-    - run
-    - name: "pip install -r {{ project_path }}/salt/root/dev/files/requirements.txt"
   
 {{ php5_fpm_instance(user, group, '5000',
                      envs={
