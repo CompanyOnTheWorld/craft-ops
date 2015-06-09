@@ -22,7 +22,7 @@ You only need these tools installed, and both have builds for most systems.
 
 > This has not been tested on Windows, but support is welcome :) The biggest issue
 > is that Windows lacks a shell that is compatible with UNIX systems.  Though it
-> [does appear to be on the way!](http://arstechnica.com/information-technology/2015/06/microsoft-bringing-ssh-to-windows-and-powershell/)
+> [does appear to be on the way!](http://blogs.msdn.com/b/powershell/archive/2015/06/03/looking-forward-microsoft-support-for-secure-shell-ssh.aspx)
 
 ## Get started with a `dev` box...
 
