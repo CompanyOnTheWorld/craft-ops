@@ -66,12 +66,6 @@ configure_legit_remote:
     - template: jinja
     - makedirs: True
     - user: {{ user }}
-
-{{ user }}_ssh_known_hosts:
-  ssh_known_hosts:
-    - name: bitbucket.org
-    - present
-    - user: {{ user }}
   
 {{ php5_fpm_instance(user, group, '5000',
                      envs={
