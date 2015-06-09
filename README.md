@@ -139,6 +139,24 @@ Then `up` the `web` vm to build it
 $ vagrant up web
 ```
 
+# Commands
+
+Craft Ops uses the tool [Fabric][fabric_link] to manage the execution ssh commands.
+This allows us to assemble super simple commands for deploying our project and
+preforming common operations on it.
+
+### Deploying
+
+The Craft Ops setup automatically creates 3 "stages" on the web server. You have
+the option of deploying to `production`, `staging`, or `preview`.
+
+To deploy your latest commit pushed to the `bitbucket` remote you would run...
+
+```
+fab production deploy
+```
+
+[fabric_link]: http://www.fabfile.org/
 [harp_link]: http://harpjs.com/
 [aws_iam_link]: https://console.aws.amazon.com/iam/
 [craft_link]: https://buildwithcraft.com/
