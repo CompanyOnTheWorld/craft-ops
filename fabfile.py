@@ -167,16 +167,6 @@ def uploads(method):
 
 @task
 @hosts()
-def assets():
-    for current_stage in env.stages:
-        stage = bunchify(stages[current_stage])
-        env.user = stage.user
-
-        local("aws s3 sync assets/www s3://"+stage.hosts+"/assets --acl public-read --region us-east-1")
-
-
-@task
-@hosts()
 def db(method):
 
     for current_stage in env.stages:
@@ -432,11 +422,5 @@ def tree():
 
 
 @task
-def compile():
-    local("harp compile assets public/static")
-
-
-@task
 def provision(): 
     local("sudo salt-call state.highstate pillar='"+json.dumps(project)+"' -l debug")
-
