@@ -299,8 +299,10 @@ def setup():
             local("git init")
 
     git_remotes = local("git remote", capture=True)
-    if "bitbucket" not in git_remotes:
-        local("git remote add bitbucket "+repo_url)
+    if "origin" not in git_remotes:
+        local("git remote add origin "+repo_url)
+    else:
+        local("git remote set-url origin "+repo_url)
 
     #
     # Update YAML
@@ -313,7 +315,7 @@ def setup():
 
     local("git add .")
     local("git commit -am 'setting up Craft Ops'")
-    local("git push -u bitbucket master")
+    local("git push -u origin master")
 
 
 @task

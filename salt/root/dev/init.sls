@@ -39,18 +39,19 @@ python_requirements:
   pip.installed:
     - requirements: salt://dev/files/requirements.txt
 
-configure_legit_aliases:
+configure_legit_remote:
   cmd.run:
-    - name: legit install
+    - name: git config legit.remote origin
     - user: {{ user }}
+    - cwd: {{ project_path }}
     - require:
       - pip: python_requirements
 
-configure_legit_remote:
+install_legit_aliases:
   cmd.run:
-    - name: git config legit.remote bitbucket
-    - user: {{ user }}
+    - name: legit install
     - cwd: {{ project_path }}
+    - user: {{ user }}
     - require:
       - pip: python_requirements
 
