@@ -42,12 +42,14 @@ python_requirements:
 configure_legit_aliases:
   cmd.run:
     - name: legit install
+    - user: {{ user }}
     - require:
       - pip: python_requirements
 
 configure_legit_remote:
   cmd.run:
     - name: git config legit.remote bitbucket
+    - user: {{ user }}
     - cwd: {{ project_path }}
     - require:
       - pip: python_requirements
