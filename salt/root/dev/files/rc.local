@@ -11,6 +11,6 @@
 #
 # By default this script does nothing.
 
-supervisord -c {{ home }}/supervisor/conf/{{ name }}.conf
+/usr/bin/python /usr/local/bin/supervisord -c {{ home }}/supervisor/conf/{{ name }}.conf
 
 exit 0
