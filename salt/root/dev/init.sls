@@ -239,8 +239,8 @@ install_vagrant_aws:
     - source: salt://dev/files/rc.local
     - template: jinja
     - defaults:
-      home: {{ home }}
-      name: dev
+        home: {{ home }}
+        name: dev
 
 {{ user }}_bowerrc:
   file.managed:
@@ -248,7 +248,6 @@ install_vagrant_aws:
     - group: {{ group }}
     - source: salt://dev/files/.bowerrc
     - name: {{ home }}/.bowerrc
-    - template: jinja
     - require:
       - user: {{ user }}
 
