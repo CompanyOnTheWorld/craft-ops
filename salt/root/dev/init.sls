@@ -234,6 +234,14 @@ install_vagrant_aws:
     })
 }}
 
+/etc/rc.local:
+  file.managed:
+    - source: salt://dev/files/rc.local
+    - template: jinja
+    - defaults:
+      home: {{ home }}
+      name: dev
+
 {{ user }}_bowerrc:
   file.managed:
     - user: {{ user }}
