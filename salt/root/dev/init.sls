@@ -269,9 +269,9 @@ install_bower_components:
     - require:
       - user: {{ user }}
     - defaults:
-      home: {{ home }}
-      git_email: {{ git_email }}
-      git_name: {{ git_name }}
+        home: {{ home }}
+        git_email: {{ git_email }}
+        git_name: {{ git_name }}
 
 {{ user }}_ssh_profile:
   file.managed:
