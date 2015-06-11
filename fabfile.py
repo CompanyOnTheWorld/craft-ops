@@ -1,9 +1,10 @@
-from bitbucket.bitbucket import Bitbucket
 from bunch import bunchify
 from fabric.api import *
+from requests.auth import HTTPBasicAuth
 
-import datetime
+import base64
 import copy
+import datetime
 import json
 import os
 import requests
@@ -139,11 +140,11 @@ def deploy(branch="master"):
         run("rm -rf $CRAFT_PATH/config")
         run("ln -s $HOME/current/craft/config $CRAFT_PATH/config")
 
-        run("rm -rf $CRAFT_PATH/plugins")
-        run("ln -s $HOME/current/craft/plugins $CRAFT_PATH/plugins")
-
         run("rm -rf $CRAFT_PATH/templates")
         run("ln -s $HOME/current/templates $CRAFT_PATH/templates")
+
+        run("rm -rf $CRAFT_PATH/plugins")
+        run("ln -s $HOME/shared/plugins $CRAFT_PATH/plugins")
 
         run("rm -rf $CRAFT_PATH/storage")
         run("ln -s $HOME/shared/storage $CRAFT_PATH/storage")
@@ -222,87 +223,123 @@ def releases(method="clean"):
 
 @task
 @hosts('localhost')
-def setup():
+def setup(method=False):
 
-    project_yaml['web'] = {}
-    project_yaml['aws'] = {}
-    project_yaml['git'] = {}
+    #
+    # Full setup
+    #
+
+    if (not method):
+
+        if 'web' not in project_yaml:
+            project_yaml['web'] = {}
+
+        local("openssl genrsa -out salt/root/web/files/web.pem 2048")
+        local("chmod 600 salt/root/web/files/web.pem")
+        local("ssh-keygen -f salt/root/web/files/web.pem -y > salt/root/web/files/web.pub")
+        local("ssh-add salt/root/web/files/web.pem")
+        local("cp salt/root/web/files/web.pub salt/root/web/files/authorized_keys")
 
     #
     # AWS
     #
 
-    local("aws ec2 create-key-pair --key-name "+project['name']+" --query 'KeyMaterial' --output text > salt/root/web/files/web.pem")
-    local("chmod 600 salt/root/web/files/web.pem")
-    local("ssh-add salt/root/web/files/web.pem")
-    local("ssh-keygen -f salt/root/web/files/web.pem -y > salt/root/web/files/web.pub")
-    local("cp salt/root/web/files/web.pem salt/root/dev/files/web.pem")
-    local("cp salt/root/web/files/web.pub salt/root/dev/files/web.pub")
-    local("cp salt/root/web/files/web.pub salt/root/web/files/authorized_keys")
+    if (not method) or (method == "aws"):
 
-    elastic_ip = json.loads(local("aws ec2 allocate-address --domain vpc", capture=True))
-    project_yaml['web']['server'] = elastic_ip['PublicIp']
-    project_yaml['aws']['elastic_ip'] = elastic_ip['PublicIp']
-    project_yaml['aws']['address_allocation_id'] = elastic_ip['AllocationId']
+        if 'aws' not in project_yaml:
+            project_yaml['aws'] = {}
 
-    vpc = json.loads(local("aws ec2 create-vpc --cidr-block 10.0.0.0/16", capture=True))['Vpc']
-    print vpc
-    project_yaml['aws']['vpc_id'] = vpc['VpcId']
+        if 'web' not in project_yaml:
+            project_yaml['web'] = {}
 
-    local("aws ec2 modify-vpc-attribute --vpc-id "+vpc['VpcId']+" --enable-dns-support", capture=True)
-    local("aws ec2 modify-vpc-attribute --vpc-id "+vpc['VpcId']+" --enable-dns-hostnames", capture=True)
+        with open("salt/root/web/files/web.pub", "rb") as public_key:
+            project_yaml['web']['key_fingerprint'] = json.loads(local("aws ec2 import-key-pair --key-name "+project['name']+" --public-key-material \""+public_key.read()+"\"", capture=True))['KeyFingerprint']
 
-    internet_gateway = json.loads(local("aws ec2 create-internet-gateway", capture=True))['InternetGateway']
-    print internet_gateway
-    project_yaml['aws']['internet_gateway_id'] = internet_gateway['InternetGatewayId']
+        elastic_ip = json.loads(local("aws ec2 allocate-address --domain vpc", capture=True))
+        project_yaml['web']['server'] = elastic_ip['PublicIp']
+        project_yaml['aws']['elastic_ip'] = elastic_ip['PublicIp']
+        project_yaml['aws']['address_allocation_id'] = elastic_ip['AllocationId']
 
-    local("aws ec2 attach-internet-gateway --internet-gateway-id "+internet_gateway['InternetGatewayId']+" --vpc-id "+vpc['VpcId'])
+        vpc = json.loads(local("aws ec2 create-vpc --cidr-block 10.0.0.0/16", capture=True))['Vpc']
+        print vpc
+        project_yaml['aws']['vpc_id'] = vpc['VpcId']
 
-    subnet = json.loads(local("aws ec2 create-subnet --vpc-id "+vpc['VpcId']+" --cidr-block 10.0.0.0/24", capture=True))['Subnet']
-    print subnet
-    project_yaml['aws']['subnet_id'] = subnet['SubnetId']
+        local("aws ec2 modify-vpc-attribute --vpc-id "+vpc['VpcId']+" --enable-dns-support", capture=True)
+        local("aws ec2 modify-vpc-attribute --vpc-id "+vpc['VpcId']+" --enable-dns-hostnames", capture=True)
 
-    route_table = json.loads(local("aws ec2 create-route-table --vpc-id "+vpc['VpcId'], capture=True))['RouteTable']
-    print route_table
-    project_yaml['aws']['route_table_id'] = route_table['RouteTableId']
+        internet_gateway = json.loads(local("aws ec2 create-internet-gateway", capture=True))['InternetGateway']
+        print internet_gateway
+        project_yaml['aws']['internet_gateway_id'] = internet_gateway['InternetGatewayId']
 
-    local("aws ec2 associate-route-table --route-table-id "+route_table['RouteTableId']+" --subnet-id "+subnet['SubnetId'])
-    local("aws ec2 create-route --route-table-id "+route_table['RouteTableId']+" --destination-cidr-block 0.0.0.0/0 --gateway-id "+internet_gateway['InternetGatewayId'])
+        local("aws ec2 attach-internet-gateway --internet-gateway-id "+internet_gateway['InternetGatewayId']+" --vpc-id "+vpc['VpcId'])
 
-    security_group = json.loads(local("aws ec2 create-security-group --vpc-id "+vpc['VpcId']+"  --group-name "+project['name']+" --description 'Web server.'", capture=True))
-    print security_group 
+        subnet = json.loads(local("aws ec2 create-subnet --vpc-id "+vpc['VpcId']+" --cidr-block 10.0.0.0/24", capture=True))['Subnet']
+        print subnet
+        project_yaml['aws']['subnet_id'] = subnet['SubnetId']
 
-    local("aws ec2 authorize-security-group-ingress --group-id "+security_group['GroupId']+" --protocol tcp --port 22 --cidr 0.0.0.0/0")
-    local("aws ec2 authorize-security-group-ingress --group-id "+security_group['GroupId']+" --protocol tcp --port 80 --cidr 0.0.0.0/0")
-    local("aws ec2 authorize-security-group-ingress --group-id "+security_group['GroupId']+" --protocol tcp --port 443 --cidr 0.0.0.0/0")
+        route_table = json.loads(local("aws ec2 create-route-table --vpc-id "+vpc['VpcId'], capture=True))['RouteTable']
+        print route_table
+        project_yaml['aws']['route_table_id'] = route_table['RouteTableId']
 
-    project_yaml['aws']['security_groups'] = [security_group['GroupId']]
+        local("aws ec2 associate-route-table --route-table-id "+route_table['RouteTableId']+" --subnet-id "+subnet['SubnetId'])
+        local("aws ec2 create-route --route-table-id "+route_table['RouteTableId']+" --destination-cidr-block 0.0.0.0/0 --gateway-id "+internet_gateway['InternetGatewayId'])
+
+        security_group = json.loads(local("aws ec2 create-security-group --vpc-id "+vpc['VpcId']+"  --group-name "+project['name']+" --description 'Web server.'", capture=True))
+        print security_group 
+
+        local("aws ec2 authorize-security-group-ingress --group-id "+security_group['GroupId']+" --protocol tcp --port 22 --cidr 0.0.0.0/0")
+        local("aws ec2 authorize-security-group-ingress --group-id "+security_group['GroupId']+" --protocol tcp --port 80 --cidr 0.0.0.0/0")
+        local("aws ec2 authorize-security-group-ingress --group-id "+security_group['GroupId']+" --protocol tcp --port 443 --cidr 0.0.0.0/0")
+
+        project_yaml['aws']['security_groups'] = [security_group['GroupId']]
 
     #
     # Bitbucket
     #
 
-    bb = Bitbucket(project['bitbucket']['user'], project['bitbucket']['token'])
-    success, result = bb.repository.create(project['name'])
-    repo_url = "git@bitbucket.org:"+project['bitbucket']['user']+"/"+project['name']+".git"
+    if (not method) or (method == "bitbucket"):
+        project_yaml['bitbucket'] = {}
+        project_yaml['git'] = {}
 
-    project_yaml['git']['repo'] = repo_url
-    pprint.pprint(result)
+        project_name = project['name']
+        bitbucket_user = project['bitbucket']['user']
+        bitbucket_token = project['bitbucket']['token']
+        auth = HTTPBasicAuth(bitbucket_user, bitbucket_token)
+        ssh_pub_key = local("ssh-keygen -f salt/root/web/files/web.pem -y", capture=True)
+        repo_url = "git@bitbucket.org:"+bitbucket_user+"/"+project_name+".git"
 
-    public_key = local("ssh-keygen -f salt/root/web/files/web.pem -y", capture=True)
-    success, result = bb.ssh.create(public_key, project['name'])
-    pprint.pprint(result)
+        req = requests.get('https://api.bitbucket.org/2.0/repositories/'+bitbucket_user+'/'+project_name, auth=auth)
 
-    with settings(warn_only=True):
-        has_git_dir = local("test -d .git", capture=True)
-        if has_git_dir.return_code != "0":
-            local("git init")
+        if req.status_code == 404:
+            data = { 'owner': bitbucket_user, 'repo_slug': project_name, 'is_private': True }
+            req = requests.post('https://api.bitbucket.org/2.0/repositories/'+bitbucket_user+'/'+project_name, data=data, auth=auth)
+            pprint.pprint(req.json())
 
-    git_remotes = local("git remote", capture=True)
-    if "origin" not in git_remotes:
-        local("git remote add origin "+repo_url)
-    else:
-        local("git remote set-url origin "+repo_url)
+        req = requests.get('https://bitbucket.org/api/1.0/repositories/'+bitbucket_user+'/'+project_name+'/deploy-keys', auth=auth)
+
+        if req.status_code == 200:
+            data = {
+                'accountname': bitbucket_user,
+                'repo_slug': project_name,
+                'label': project_name,
+                'key': ssh_pub_key
+            }
+            req = requests.post('https://bitbucket.org/api/1.0/repositories/'+bitbucket_user+'/'+project_name+'/deploy-keys', data=data, auth=auth)
+            project_yaml['bitbucket']['deploy_key_id'] = req.json()['pk']
+            pprint.pprint(req.json())
+
+        with settings(warn_only=True):
+            has_git_dir = local("test -d .git", capture=True)
+            if has_git_dir.return_code != "0":
+                local("git init")
+
+        git_remotes = local("git remote", capture=True)
+        if "origin" not in git_remotes:
+            local("git remote add origin "+repo_url)
+        else:
+            local("git remote set-url origin "+repo_url)
+
+        project_yaml['git']['repo'] = repo_url
 
     #
     # Update YAML
@@ -313,99 +350,112 @@ def setup():
     with open('project.conf', 'w') as project_file:
         project_file.write(new_project_yaml)
 
-    local("git add .")
-    local("git commit -am 'setting up Craft Ops'")
-    local("git push -u origin master")
-
 
 @task
 @hosts('localhost')
-def clean():
+def clean(method=False):
+
+    if (not method) or (method == "aws"):
+
+        #
+        # AWS
+        #
+
+        local("aws ec2 delete-key-pair --key-name "+project['name'], capture=True)
+
+        if project['aws']['address_allocation_id']:
+            local("aws ec2 release-address --allocation-id "+project['aws']['address_allocation_id'], capture=True)
+
+        vpc_id = project['aws']['vpc_id']
+
+        security_groups = local("aws ec2 describe-security-groups --filters Name=vpc-id,Values="+vpc_id+" --output json --query 'SecurityGroups[]'", capture=True)
+        if security_groups != "": 
+            for security_group in json.loads(security_groups):
+                print security_group
+                if security_group['GroupName'] != 'default':
+                    local("aws ec2 delete-security-group --group-id "+security_group['GroupId'], capture=True)
+        else:
+            print "No SecurityGroups"
+
+        internet_gateways = local("aws ec2 describe-internet-gateways --filters Name=attachment.vpc-id,Values="+vpc_id+" --output json --query 'InternetGateways[]'", capture=True)
+        if internet_gateways != "": 
+            for internet_gateway in json.loads(internet_gateways):
+                print internet_gateway
+                for attachment in internet_gateway['Attachments']:
+                    print attachment
+                    local("aws ec2 detach-internet-gateway --internet-gateway-id "+internet_gateway['InternetGatewayId']+" --vpc-id "+attachment['VpcId'])
+                    local("aws ec2 delete-internet-gateway --internet-gateway-id "+internet_gateway['InternetGatewayId'])
+        else:
+            print "No InternetGateways"
+
+        subnets = local("aws ec2 describe-subnets --filters Name=vpc-id,Values="+vpc_id+" --output json --query 'Subnets[]'", capture=True)
+        if subnets != "":
+            for subnet in json.loads(subnets):
+                print subnet
+                local("aws ec2 delete-subnet --subnet-id "+subnet['SubnetId'])
+        else:
+            print "No Subnets"
+
+        route_tables = local("aws ec2 describe-route-tables --filters Name=vpc-id,Values="+vpc_id+" --output json --query 'RouteTables[]'", capture=True)
+        if route_tables != "":
+            for route_table in json.loads(route_tables):
+                print route_table
+                if len(route_table['Associations']) < 1:
+                    local("aws ec2 delete-route-table --route-table-id "+route_table['RouteTableId'])
+        else:
+            print "No RouteTables"
+
+        vpc = local("aws ec2 describe-vpcs --filters Name=vpc-id,Values="+vpc_id+" --output json --query 'Vpcs[]'", capture=True)
+        if vpc != "":
+            local("aws ec2 delete-vpc --vpc-id "+vpc_id)
+        else:
+            print "No Vpc"
+
+        project_yaml.pop('aws', None)
+
+    if (not method) or (method == "bitbucket"):
+        #
+        # Bitbucket
+        #
+
+        project_name = project['name']
+        bitbucket_user = project['bitbucket']['user']
+        bitbucket_token = project['bitbucket']['token']
+        bitbucket_deploy_key_id = str(project['bitbucket']['deploy_key_id'])
+        auth = HTTPBasicAuth(bitbucket_user, bitbucket_token)
+
+        req = requests.get('https://api.bitbucket.org/2.0/repositories/'+bitbucket_user+'/'+project_name, auth=auth)
+
+        if req.status_code == 200:
+            data = { 'accountname': bitbucket_user, 'repo_slug': project_name, 'pk': bitbucket_deploy_key_id }
+            req = requests.delete('https://api.bitbucket.org/1.0/repositories/'+bitbucket_user+'/'+project_name+'/deploy-keys/'+bitbucket_deploy_key_id, data=data, auth=auth)
+
+            if req.status_code == 204:
+                project_yaml['bitbucket'].pop('deploy_key_id', None)
+
+        with settings(warn_only=True):
+            local("git remote rm origin")
+
 
     #
-    # Bitbucket
+    # Full clean
     #
 
-    bb = Bitbucket(project['bitbucket']['user'], project['bitbucket']['token'])
+    if (not method):
+        local("rm -f salt/root/web/files/web.pem")
+        local("rm -f salt/root/web/files/web.pub")
+        local("rm -f salt/root/dev/files/web.pem")
+        local("rm -f salt/root/dev/files/web.pub")
+        local("cat /dev/null > salt/root/web/files/authorized_keys")
 
-    bb.repository.delete(project['name'])
+        project_yaml.pop('web', None)
+        project_yaml.pop('bitbucket', None)
+        project_yaml.pop('git', None)
 
-    with settings(warn_only=True):
-        local("git remote rm bitbucket")
-
-    success, ssh_keys = bb.ssh.all()
-
-    for key in ssh_keys:
-        if key['label'] == project['name']:
-            pprint.pprint(key)
-            bb.ssh.delete(key['pk'])
-
-    #
-    # AWS
-    #
-
-    local("rm -f salt/root/web/files/web.pem")
-    local("rm -f salt/root/web/files/web.pub")
-    local("rm -f salt/root/dev/files/web.pem")
-    local("rm -f salt/root/dev/files/web.pub")
-    local("cat /dev/null > salt/root/web/files/authorized_keys")
-    local("aws ec2 delete-key-pair --key-name "+project['name'], capture=True)
-
-    if project['aws']['address_allocation_id']:
-        local("aws ec2 release-address --allocation-id "+project['aws']['address_allocation_id'], capture=True)
-
-    vpc_id = project['aws']['vpc_id']
-
-    security_groups = local("aws ec2 describe-security-groups --filters Name=vpc-id,Values="+vpc_id+" --output json --query 'SecurityGroups[]'", capture=True)
-    if security_groups != "": 
-        for security_group in json.loads(security_groups):
-            print security_group
-            if security_group['GroupName'] != 'default':
-                local("aws ec2 delete-security-group --group-id "+security_group['GroupId'], capture=True)
-    else:
-        print "No SecurityGroups"
-
-    internet_gateways = local("aws ec2 describe-internet-gateways --filters Name=attachment.vpc-id,Values="+vpc_id+" --output json --query 'InternetGateways[]'", capture=True)
-    if internet_gateways != "": 
-        for internet_gateway in json.loads(internet_gateways):
-            print internet_gateway
-            for attachment in internet_gateway['Attachments']:
-                print attachment
-                local("aws ec2 detach-internet-gateway --internet-gateway-id "+internet_gateway['InternetGatewayId']+" --vpc-id "+attachment['VpcId'])
-                local("aws ec2 delete-internet-gateway --internet-gateway-id "+internet_gateway['InternetGatewayId'])
-    else:
-        print "No InternetGateways"
-
-    subnets = local("aws ec2 describe-subnets --filters Name=vpc-id,Values="+vpc_id+" --output json --query 'Subnets[]'", capture=True)
-    if subnets != "":
-        for subnet in json.loads(subnets):
-            print subnet
-            local("aws ec2 delete-subnet --subnet-id "+subnet['SubnetId'])
-    else:
-        print "No Subnets"
-
-    route_tables = local("aws ec2 describe-route-tables --filters Name=vpc-id,Values="+vpc_id+" --output json --query 'RouteTables[]'", capture=True)
-    if route_tables != "":
-        for route_table in json.loads(route_tables):
-            print route_table
-            if len(route_table['Associations']) < 1:
-                local("aws ec2 delete-route-table --route-table-id "+route_table['RouteTableId'])
-    else:
-        print "No RouteTables"
-
-    vpc = local("aws ec2 describe-vpcs --filters Name=vpc-id,Values="+vpc_id+" --output json --query 'Vpcs[]'", capture=True)
-    if vpc != "":
-        local("aws ec2 delete-vpc --vpc-id "+vpc_id)
-    else:
-        print "No Vpc"
 
     #
     # Update YAML
     #
-
-    project_yaml.pop('web', None)
-    project_yaml.pop('aws', None)
-    project_yaml.pop('git', None)
 
     new_project_yaml = ruamel.yaml.dump(project_yaml, Dumper=ruamel.yaml.RoundTripDumper)
 

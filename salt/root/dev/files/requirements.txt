@@ -1,5 +1,4 @@
 awscli
-bitbucket-api
 boto
 bunch
 fabric

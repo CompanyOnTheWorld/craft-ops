@@ -47,6 +47,8 @@ php5-restart:
 {% set mysql_db = stages[stage]['mysql_db'] -%}
 
 {% set uploads_path = home + "/shared/assets" -%}
+{% set php_vendor_path = home + "/shared/vendor" -%}
+{% set plugins_path = home + "/shared/plugins" -%}
 {% set craft_path = home + "/shared/vendor/Craft-Release-master" -%}
 
 {{ env(user, group) }}
@@ -157,6 +159,28 @@ php5-restart:
     - recurse:
       - user
       - group
+
+{{ plugins_path }}:
+  file.directory:
+    - user: {{ user }}
+    - group: {{ group }}
+    - makedirs: True
+
+{{ user }}_download_guzzle_plugin:
+  archive.extracted:
+    - name: {{ php_vendor_path }}
+    - source: https://github.com/davist11/craft-guzzle/archive/master.tar.gz 
+    - source_hash: md5=8758bcc8e33ba59dacca7c3ead7a31eb
+    - archive_format: tar
+    - user: {{ user }}
+    - group: {{ group }}
+    - if_missing: {{ php_vendor_path }}/craft-guzzle-master
+
+{{ home }}/shared/plugins/guzzle:
+  file.symlink:
+    - user: {{ user }}
+    - group: {{ group }}
+    - target: {{ php_vendor_path }}/craft-guzzle-master/guzzle
 
 {{ user }}_bowerrc:
   file.managed:
