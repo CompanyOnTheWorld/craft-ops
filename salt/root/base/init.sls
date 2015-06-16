@@ -9,37 +9,37 @@ include:
   - stackstrap.mysql.server
   - stackstrap.mysql.client
 
-nodejs.ppa:
+iojs.ppa:
   pkgrepo.managed:
     - humanname: NodeSource Node.js Repository
-    - name: deb https://deb.nodesource.com/node_0.12 {{ grains['oscodename'] }} main
+    - name: deb https://deb.nodesource.com/iojs_2.x {{ grains['oscodename'] }} main
     - dist: {{ grains['oscodename'] }}
     - file: /etc/apt/sources.list.d/nodesource.list
     - keyid: "68576280"
     - key_url: https://deb.nodesource.com/gpgkey/nodesource.gpg.key
     - keyserver: keyserver.ubuntu.com
     - require_in:
-      pkg: nodejs
+      pkg: iojs
 
-nodejs:
+iojs:
   pkg.installed:
-    - name: nodejs
+    - name: iojs
 
-node_global_bower:
+global_bower:
   cmd:
     - run
     - name: npm install -g bower
     - unless: npm -g ls bower | grep bower
     - require:
-      - pkg: nodejs
+      - pkg: iojs
 
-node_global_harp:
+global_harp:
   cmd:
     - run
     - name: npm install -g harp
     - unless: npm -g ls harp | grep harp
     - require:
-      - pkg: nodejs
+      - pkg: iojs
 
 remove-nginx-default-conf:
   file:
