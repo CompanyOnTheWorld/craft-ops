@@ -30,7 +30,7 @@ Unix-like command prompt.  There are many shell options for Windows, but
 this is likely your best option.
 
 Once you have built the `dev` VM you can also use an experimental web based
-terminal @ [http://localhost:3000](http://localhost:3000). You may find this
+terminal @ [`http://localhost:3000`](http://localhost:3000). You may find this
 a more enjoyable experience.
 
 ## Get started with a `dev` box...
