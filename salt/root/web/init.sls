@@ -146,7 +146,7 @@ php5-restart:
   archive.extracted:
     - name: {{ home }}/shared/vendor
     - source: https://github.com/pixelandtonic/Craft-Release/archive/master.tar.gz 
-    - source_hash: md5=29acdf188d865e0b7e44e7144e68bcef
+    - source_hash: md5=3a4ebe106d2b2e007f32e0088c3ee20f
     - archive_format: tar
     - archive_user: {{ home }}
     - if_missing: {{ home }}/shared/vendor/Craft-Release-master
