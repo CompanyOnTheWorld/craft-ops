@@ -229,10 +229,23 @@ install_vagrant_aws:
     - require:
       - pkg: install_vagrant
 
+node_global_wetty:
+  cmd:
+    - run
+    - name: npm install -g wetty
+    - unless: npm -g ls wetty | grep wetty
+    - require:
+      - pkg: nodejs
+
 {{ supervise("dev", home, user, group, {
         "harp": {
             "command": "harp server",
             "directory": assets_path,
+            "user": user
+        },
+        "wetty": {
+          "command": "wetty -p 3000 --sshuser=vagrant",
+            "directory": project_path,
             "user": user
         }
     })

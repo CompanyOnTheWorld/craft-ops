@@ -33,6 +33,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     dev.ssh.forward_agent = true
 
     dev.vm.network "forwarded_port", guest: 8000, host: 8000
+    dev.vm.network "forwarded_port", guest: 3000, host: 3000
 
     dev.vm.synced_folder ".", "/project"
 
