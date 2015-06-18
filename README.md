@@ -20,9 +20,18 @@ You only need these tools installed, and both have builds for most systems.
 - [Vagrant][vagrant_link]
 - [VirtualBox][virtualbox_link]
 
-> This has not been tested on Windows, but support is welcome :) The biggest issue
-> is that Windows lacks a shell that is compatible with UNIX systems.  Though it
-> [does appear to be on the way!](http://blogs.msdn.com/b/powershell/archive/2015/06/03/looking-forward-microsoft-support-for-secure-shell-ssh.aspx)
+##### Windows
+
+The best way to get started with Windows is by installing the
+[Git for Windows][git_windows] toolset.  This installer gives you all
+the bits an pieces required to run git on Windows.  As a bonus it comes with
+its own bash shell which allows you to operate your Windows system with a
+Unix-like command prompt.  There are many shell options for Windows, but 
+this is likely your best option.
+
+Once you have built the `dev` VM you can also use an experimental web based
+terminal @ [http://localhost:3000](http://localhost:3000). You may find this
+a more enjoyable experience.
 
 ## Get started with a `dev` box...
 
@@ -190,6 +199,7 @@ $ fab production uploads:up
 [aws_iam_link]: https://console.aws.amazon.com/iam/
 [craft_link]: https://buildwithcraft.com/
 [craft_license]: https://buildwithcraft.com/license
+[git_windows]: https://msysgit.github.io/
 [project_conf_link]: https://github.com/stackstrap/craft-ops/blob/master/project.conf#L3
 [unix_like_link]:http://en.wikipedia.org/wiki/Unix-like
 [vagrant_link]: http://vagrantup.com
