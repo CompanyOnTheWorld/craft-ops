@@ -42,7 +42,7 @@ $ git clone https://github.com/stackstrap/craft-ops.git project_name
 $ vagrant up dev
 ```
 
-You can then hit the dev server at `http://localhost:8000`
+You can then hit the dev server at [`http://localhost:8000`](http://localhost:8000).
 
 ### Asset pipline
 
