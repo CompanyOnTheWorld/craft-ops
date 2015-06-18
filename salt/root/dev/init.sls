@@ -97,29 +97,21 @@ install_legit_aliases:
   file.directory:
     - user: {{ user }}
     - group: {{ group }}
-    - mode: 755
-    - makedirs: True
 
 {{ uploads_path }}:
   file.directory:
     - user: {{ user }}
     - group: {{ group }}
-    - mode: 755
-    - makedirs: True
 
-{{ project_path }}/craft/plugins:
+{{ home }}/plugins:
   file.directory:
     - user: {{ user }}
     - group: {{ group }}
-    - mode: 755
-    - makedirs: True
 
-{{ project_path }}/craft/storage:
+{{ home }}/storage:
   file.directory:
     - user: {{ user }}
     - group: {{ group }}
-    - mode: 755
-    - makedirs: True
 
 download_craft:
   archive.extracted:
@@ -150,13 +142,13 @@ download_craft:
   file.symlink:
     - user: {{ user }}
     - group: {{ group }}
-    - target: {{ project_path }}/craft/plugins
+    - target: {{ home }}/plugins
 
 {{ craft_path }}/storage:
   file.symlink:
     - user: {{ user }}
     - group: {{ group }}
-    - target: {{ project_path }}/craft/storage
+    - target: {{ home }}/storage
 
 {{ craft_path }}/templates:
   file.symlink:
@@ -174,7 +166,16 @@ download_craft_guzzle_plugin:
     - group: {{ group }}
     - if_missing: {{ php_vendor_path }}/craft-guzzle-master
 
-{{ project_path }}/craft/plugins/guzzle:
+{{ php_vendor_path }}/craft-guzzle-master:
+  file.directory:
+    - user: {{ user }}
+    - group: {{ group }}
+    - makedirs: True
+    - recurse:
+      - user
+      - group
+
+{{ home }}/plugins/guzzle:
   file.symlink:
     - user: {{ user }}
     - group: {{ group }}
