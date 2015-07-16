@@ -116,8 +116,8 @@ install_legit_aliases:
 download_craft:
   archive.extracted:
     - name: {{ php_vendor_path }}
-    - source: https://github.com/pixelandtonic/Craft-Release/archive/master.tar.gz 
-    - source_hash: md5=3a4ebe106d2b2e007f32e0088c3ee20f
+    - source: project['craft']['source'] 
+    - source_hash: md5=project['craft']['source_hash']
     - archive_format: tar
     - user: {{ user }}
     - group: {{ group }}

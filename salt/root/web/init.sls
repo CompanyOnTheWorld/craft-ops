@@ -145,11 +145,11 @@ php5-restart:
 {{ user }}_download_craft:
   archive.extracted:
     - name: {{ home }}/shared/vendor
-    - source: https://github.com/pixelandtonic/Craft-Release/archive/master.tar.gz 
-    - source_hash: md5=3a4ebe106d2b2e007f32e0088c3ee20f
+    - source: project['craft']['source'] 
+    - source_hash: md5=project['craft']['source_hash']
     - archive_format: tar
     - archive_user: {{ home }}
-    - if_missing: {{ home }}/shared/vendor/Craft-Release-master
+    - if_missing: {{ craft_path }}
 
 {{ home }}/shared/vendor/Craft-Release-master:
   file.directory:
