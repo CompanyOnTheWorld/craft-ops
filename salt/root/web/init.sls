@@ -146,7 +146,7 @@ php5-restart:
   archive.extracted:
     - name: {{ home }}/shared/vendor
     - source: {{ project['craft']['source'] }}
-    - source_hash: md5={{ project['craft']['source_hash'] }}
+    - source_hash: {{ project['craft']['source_hash'] }}
     - archive_format: tar
     - archive_user: {{ home }}
     - if_missing: {{ craft_path }}

@@ -117,7 +117,7 @@ download_craft:
   archive.extracted:
     - name: {{ php_vendor_path }}
     - source: {{ project['craft']['source'] }}
-    - source_hash: md5={{ project['craft']['source_hash'] }}
+    - source_hash: {{ project['craft']['source_hash'] }}
     - archive_format: tar
     - user: {{ user }}
     - group: {{ group }}
