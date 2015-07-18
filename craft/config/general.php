@@ -20,6 +20,7 @@ return array(
     ),
     'local' => array(
         'devMode' => true,
+		'siteUrl' => 'http://localhost:8000/',
         'environmentVariables' => array(
             'baseUrl'  => 'http://localhost:8000/',
         ),
