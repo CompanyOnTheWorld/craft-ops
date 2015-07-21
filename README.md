@@ -13,6 +13,16 @@ These products both offer free options and can be fully automated.
 Please also note that use of Craft is subject to their own
 [license agreement][craft_license].
 
+### Why?
+
+The goal of this project is to keep **everything** in one place.  This cuts
+out any mystery as to how the project comes together as a whole. Just by
+browsing through a few files you can see how all of the services at play
+are configured.  As well, the deployment command logic is also laid out in 
+one file making it easy to understand how all of the operations tie together.
+At the end of the day it makes it easier to onboard new people and pass the
+project between teams.
+
 ##### Requirements
 
 You only need these tools installed, and both have builds for most systems.
