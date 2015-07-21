@@ -21,7 +21,7 @@ browsing through a few files you can see how all of the services at play
 are configured.  As well, the deployment command logic is laid out in one
 file making it easy to understand how all of the operations tie together.
 At the end of the day it makes it easier to onboard new people and pass the
-project between teams.
+project between teams. The less reverse engineering the better!
 
 ##### Requirements
 
