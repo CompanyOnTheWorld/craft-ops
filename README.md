@@ -18,8 +18,8 @@ Please also note that use of Craft is subject to their own
 The goal of this project is to keep **everything** in one place.  This cuts
 out any mystery as to how the project comes together as a whole. Just by
 browsing through a few files you can see how all of the services at play
-are configured.  As well, the deployment command logic is also laid out in 
-one file making it easy to understand how all of the operations tie together.
+are configured.  As well, the deployment command logic is laid out in one
+file making it easy to understand how all of the operations tie together.
 At the end of the day it makes it easier to onboard new people and pass the
 project between teams.
 
