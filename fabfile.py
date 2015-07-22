@@ -311,7 +311,12 @@ def setup(method=False):
         req = requests.get('https://api.bitbucket.org/2.0/repositories/'+bitbucket_user+'/'+project_name, auth=auth)
 
         if req.status_code == 404:
-            data = { 'owner': bitbucket_user, 'repo_slug': project_name, 'is_private': True }
+            data = {
+                'scm': 'git',
+                'owner': bitbucket_user,
+                'repo_slug': project_name,
+                'is_private': True
+            }
             req = requests.post('https://api.bitbucket.org/2.0/repositories/'+bitbucket_user+'/'+project_name, data=data, auth=auth)
             pprint.pprint(req.json())
 
