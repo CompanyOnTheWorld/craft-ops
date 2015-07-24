@@ -47,6 +47,8 @@ node_global_browserify:
 
 {% set project_path = home + '/current' -%}
 {% set repo = project['git']['repo'] -%}
+{% set git_name = project['git']['name'] if project['git']['name'] else "Craft Ops User" -%}
+{% set git_email = project['git']['email'] if project['git']['email'] else "info@stackstrap.org" -%}
 
 {% set port = stages[stage]['port'] -%}
 
@@ -68,6 +70,20 @@ node_global_browserify:
     - makedirs: True
     - user: {{ user }}
     - mode: 600
+
+{{ stage }}_git_config_name:
+  git.config:
+    - name: user.name
+    - value: {{ git_name }}
+    - user: {{ user }}
+    - is_global: True
+
+{{ stage }}_git_config_email:
+  git.config:
+    - name: user.email
+    - value: {{ git_email }}
+    - user: {{ user }}
+    - is_global: True
 
 {{ deploy(user, group,
           repo=repo,
