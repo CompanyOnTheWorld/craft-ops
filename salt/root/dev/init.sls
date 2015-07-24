@@ -243,6 +243,11 @@ node_global_wetty:
             "directory": assets_path,
             "user": user
         },
+        "watchify": {
+            "command": "watchify js/main.js -o js/bundle.js",
+            "directory": assets_path,
+            "user": user
+        },
         "wetty": {
           "command": "wetty -p 3000 --sshuser=vagrant",
             "directory": project_path,
@@ -258,6 +263,14 @@ node_global_wetty:
     - defaults:
         home: {{ home }}
         name: dev
+
+node_global_watchify:
+  cmd:
+    - run
+    - name: npm install -g watchify
+    - unless: npm -g ls watchify | grep watchify
+    - require:
+      - pkg: nodejs
 
 {{ user }}_bowerrc:
   file.managed:
