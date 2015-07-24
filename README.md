@@ -79,7 +79,7 @@ Browserify is an excellent way to make use of `CommonJS` and break your code up 
 `modules` the same way you would with Node.js.  Browserify is a nice improvement to
 the complex API of RequireJS and AMD. It also handily bundles all of your code into
 a single file. By default any changes to `assets/js/main.js` will automatically be
-outputto `assets/js/bundle.js`.
+output to `assets/js/bundle.js`.
 
 
 # Completing the Ops setup
