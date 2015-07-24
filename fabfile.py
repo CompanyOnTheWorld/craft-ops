@@ -126,8 +126,8 @@ def deploy(branch="master"):
         stage = bunchify(stages[current_stage])
         env.user = stage.user
 
-        run("cd $HOME/source && git fetch bitbucket "+branch)
-        run("cd $HOME/source && git archive bitbucket/"+branch+" --prefix=$HOME/releases/"+time+"/ | (cd /; tar xf -)")
+        run("cd $HOME/source && git fetch origin "+branch)
+        run("cd $HOME/source && git archive origin/"+branch+" --prefix=$HOME/releases/"+time+"/ | (cd /; tar xf -)")
 
         run("rm -rf $HOME/current")
 
