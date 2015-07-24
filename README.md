@@ -75,11 +75,12 @@ assets will end up being output to  `assets/vendor` and therefore available at
 
 ##### Browserify
 
-Browserify is an excellent way to make use of `CommonJS` and break your code up into
-`modules` the same way you would with Node.js.  Browserify is a nice improvement to
-the complex API of RequireJS and AMD. It also handily bundles all of your code into
-a single file. By default any changes to `assets/js/main.js` will automatically be
-output to `assets/js/bundle.js`.
+[Browserify][browserify_link] is an excellent way to make use of `CommonJS` and
+break your code up into `modules` the same way you would with Node.js.Browserify
+is a nice improvement to the complex API of RequireJS and AMD, while offering the
+same advantages. It also handily bundles all of your code into a single file so
+that you cut down on HTTP requests. By default any changes to `assets/js/main.js`
+will automatically be output to `assets/js/bundle.js`.
 
 
 # Completing the Ops setup
@@ -213,6 +214,7 @@ Or maybe you want to sync your `dev` uploads to `production`...
 $ fab production uploads:up
 ```
 
+[browserify_link]: http://browserify.org/
 [fabric_link]: http://www.fabfile.org/
 [harp_link]: http://harpjs.com/
 [aws_iam_link]: https://console.aws.amazon.com/iam/
