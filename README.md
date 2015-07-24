@@ -73,6 +73,18 @@ project.  Just run `bower install` within the `dev` vm (`vagrant ssh dev`) and t
 assets will end up being output to  `assets/vendor` and therefore available at
 `http://localhost:8000/static/vendor`.
 
+##### Browserify
+
+[Browserify][browserify_link] is an excellent way to make use of `CommonJS` and
+break your code up into `modules` the same way you would with Node.js.Browserify
+is a nice improvement to the complex API of RequireJS and AMD, while offering the
+same advantages. It also handily bundles all of your code into a single file so
+that you cut down on HTTP requests. By default any changes to `assets/js/main.js`
+will automatically be output to `assets/js/bundle.js`. Since everything in the
+`assets` folder is passing through harp, the file will be available at
+`http://localhost:8000/static/js/bundle.js`.
+
+
 # Completing the Ops setup
 
 #### How the configuration works
@@ -204,6 +216,7 @@ Or maybe you want to sync your `dev` uploads to `production`...
 $ fab production uploads:up
 ```
 
+[browserify_link]: http://browserify.org/
 [fabric_link]: http://www.fabfile.org/
 [harp_link]: http://harpjs.com/
 [aws_iam_link]: https://console.aws.amazon.com/iam/
