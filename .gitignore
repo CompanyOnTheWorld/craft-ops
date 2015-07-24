@@ -74,3 +74,4 @@ vendor
 *.pub
 public/assets/*
 salt/web/root/files/authorized_keys
+bundle.js

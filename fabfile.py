@@ -150,6 +150,7 @@ def deploy(branch="master"):
         run("ln -s $HOME/shared/storage $CRAFT_PATH/storage")
 
         run("cd $HOME/current && bower install")
+        run("cd $HOME/current/assets && browserify js/main.js -o js/bundle.js")
         run("harp compile $HOME/current/assets $HOME/shared/static")
 
 
