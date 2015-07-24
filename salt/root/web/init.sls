@@ -16,6 +16,14 @@ php5-restart:
     - require:
       - cmd: php-mcrypt-enable
 
+node_global_browserify:
+  cmd:
+    - run
+    - name: npm install -g browserify
+    - unless: npm -g ls browserify | grep browserify
+    - require:
+      - pkg: nodejs
+
 {% from "stackstrap/env/macros.sls" import env -%}
 {% from "stackstrap/deploy/macros.sls" import deploy %}
 {% from "stackstrap/nginx/macros.sls" import nginxsite %}
