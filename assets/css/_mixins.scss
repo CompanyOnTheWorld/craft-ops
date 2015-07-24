@@ -1,0 +1,18 @@
+/* Media Queries */
+
+// Reference: http://css-tricks.com/conditional-media-query-mixins/
+
+/* The idea is to approach media queries in a "mobile first",
+   each media query is designed to "target" certain ranges. */
+
+@mixin mq($point) {
+  @if $point == large {
+    @media (min-width: 1250px) { @content; }
+  }
+  @else if $point == medium {
+    @media (min-width: 600px) and (max-width: 1250px) { @content; }
+  }
+  @else if $point == small {
+    @media (max-width: 600px) { @content; }
+  }
+}
