@@ -71,7 +71,7 @@ node_global_browserify:
 
 {{ deploy(user, group,
           repo=repo,
-          remote_name='bitbucket',
+          remote_name='origin',
           identity=home+'/.ssh/web.pem')
 }}
 
