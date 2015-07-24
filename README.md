@@ -80,7 +80,9 @@ break your code up into `modules` the same way you would with Node.js.Browserify
 is a nice improvement to the complex API of RequireJS and AMD, while offering the
 same advantages. It also handily bundles all of your code into a single file so
 that you cut down on HTTP requests. By default any changes to `assets/js/main.js`
-will automatically be output to `assets/js/bundle.js`.
+will automatically be output to `assets/js/bundle.js`. Since everything in the
+`assets` folder is passing through harp, the file will be available at
+`static/js/bundle.js`.
 
 
 # Completing the Ops setup
