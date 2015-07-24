@@ -237,6 +237,14 @@ node_global_wetty:
     - require:
       - pkg: nodejs
 
+node_global_watchify:
+  cmd:
+    - run
+    - name: npm install -g watchify
+    - unless: npm -g ls watchify | grep watchify
+    - require:
+      - pkg: nodejs
+
 {{ supervise("dev", home, user, group, {
         "harp": {
             "command": "harp server",
@@ -263,14 +271,6 @@ node_global_wetty:
     - defaults:
         home: {{ home }}
         name: dev
-
-node_global_watchify:
-  cmd:
-    - run
-    - name: npm install -g watchify
-    - unless: npm -g ls watchify | grep watchify
-    - require:
-      - pkg: nodejs
 
 {{ user }}_bowerrc:
   file.managed:
