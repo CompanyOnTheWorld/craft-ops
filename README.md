@@ -82,7 +82,7 @@ same advantages. It also handily bundles all of your code into a single file so
 that you cut down on HTTP requests. By default any changes to `assets/js/main.js`
 will automatically be output to `assets/js/bundle.js`. Since everything in the
 `assets` folder is passing through harp, the file will be available at
-`static/js/bundle.js`.
+`http://localhost:8000/static/js/bundle.js`.
 
 
 # Completing the Ops setup
