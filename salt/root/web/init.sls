@@ -211,9 +211,12 @@ node_global_browserify:
     - user: {{ user }}
     - group: {{ group }}
     - source: salt://web/files/.bowerrc
+    - template: jinja
     - name: {{ home }}/.bowerrc
     - require:
       - user: {{ user }}
+    - defaults:
+      home: {{ home }}
 
 {{ user }}_profile_setup:
   file.managed:

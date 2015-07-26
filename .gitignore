@@ -70,6 +70,7 @@ private.conf
 .vagrant/machines/basebox
 package.box
 vendor
+bower_components
 *.pem
 *.pub
 public/assets/*
