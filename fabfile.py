@@ -441,7 +441,7 @@ def clean(method=False):
                 project_yaml['bitbucket'].pop('deploy_key_id', None)
 
         with settings(warn_only=True):
-            local("git remote rm origin")
+            local("git remote set-url origin git@github.com:stackstrap/craft-ops.git")
 
 
     #
