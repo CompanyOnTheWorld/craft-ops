@@ -1,4 +1,5 @@
 {
+  "name": "Craft Ops",
   "dependencies": {
     "bows": "^1.4.8"
   }
