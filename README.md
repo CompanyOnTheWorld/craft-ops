@@ -75,7 +75,7 @@ available at `http://localhost:8000/static/vendor`.
 ##### Browserify
 
 [Browserify][browserify_link] is an excellent way to make use of `CommonJS` and
-break your code up into `modules` the same way you would with Node.js.Browserify
+break your code up into `modules` or use packages from [npm][npm_link]. Browserify
 is a nice improvement to the complex API of RequireJS and AMD, while offering the
 same advantages. It also handily bundles all of your code into a single file so
 that you cut down on HTTP requests. By default any changes to `assets/js/_main.js`
@@ -218,6 +218,7 @@ $ fab production uploads:up
 [browserify_link]: http://browserify.org/
 [fabric_link]: http://www.fabfile.org/
 [harp_link]: http://harpjs.com/
+[npm_link]: http://npmjs.org
 [aws_iam_link]: https://console.aws.amazon.com/iam/
 [craft_link]: https://buildwithcraft.com/
 [craft_license]: https://buildwithcraft.com/license
