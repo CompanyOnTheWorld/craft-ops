@@ -1,19 +1,4 @@
 {
-  "name": "Craft Ops",
-  "version": "0.0.0",
-  "homepage": "https://github.com/stackstrap/craft-ops",
-  "authors": [
-    "None <None>"
-  ],
-  "license": "MIT",
-  "ignore": [
-    "**/.*",
-    "node_modules",
-    "bower_components",
-    "vendor",
-    "test",
-    "tests"
-  ],
   "dependencies": {
     "furtive": "~2.1.0"
   }
