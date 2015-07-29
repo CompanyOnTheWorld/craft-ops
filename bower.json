@@ -1,5 +1,5 @@
 {
-  "name": "Craft Ops",
+  "name": "craft-ops",
   "dependencies": {
     "furtive": "~2.1.0"
   }
