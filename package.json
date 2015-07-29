@@ -1,21 +1,4 @@
 {
-  "name": "craft-ops",
-  "version": "1.0.0",
-  "description": "DevOps for Craft CMS.",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/stackstrap/craft-ops.git"
-  },
-  "author": "",
-  "license": "Unlicense",
-  "bugs": {
-    "url": "https://github.com/stackstrap/craft-ops/issues"
-  },
-  "homepage": "https://github.com/stackstrap/craft-ops#readme",
   "dependencies": {
     "bows": "^1.4.8"
   }
