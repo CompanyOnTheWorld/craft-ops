@@ -135,8 +135,6 @@ def deploy(branch="master"):
 
         run("ln -s $HOME/shared/vendor $HOME/current/vendor")
         run("ln -s $HOME/shared/assets $HOME/current/public/assets")
-        run("ln -s $HOME/shared/static $HOME/current/public/static")
-        run("ln -s $HOME/shared/bower_components $HOME/current/public/static/vendor")
 
         run("rm -rf $CRAFT_PATH/config")
         run("ln -s $HOME/current/craft/config $CRAFT_PATH/config")
@@ -150,9 +148,16 @@ def deploy(branch="master"):
         run("rm -rf $CRAFT_PATH/storage")
         run("ln -s $HOME/shared/storage $CRAFT_PATH/storage")
 
+        run("ln -s $HOME/shared/node_modules $HOME/current/node_modules")
+        run("cd $HOME/current && npm install")
+
+        run("cd $HOME/current && browserify assets/js/_main.js -o assets/js/bundle.js")
+
+        run("ln -s $HOME/shared/static $HOME/current/public/static")
+        run("cd $HOME/current && harp compile assets public/static")
+
+        run("ln -s $HOME/shared/bower_components $HOME/current/public/static/vendor")
         run("cd $HOME/current && bower install")
-        run("cd $HOME/current/assets && browserify js/main.js -o js/bundle.js")
-        run("harp compile $HOME/current/assets $HOME/shared/static")
 
 
 @task

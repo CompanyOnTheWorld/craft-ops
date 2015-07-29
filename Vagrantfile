@@ -72,7 +72,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   end
 
   config.vm.define "web" do |web|
-    web.vm.synced_folder ".", "/project", type: "rsync"
+    web.vm.synced_folder ".", "/project",
+      type: "rsync",
+      rsync__exclude: [".git/", "vendor/", "node_modules/", "bower_components/"]
 
     web.vm.box = $project['web']['vagrant']['box']
     web.vm.box_url = $project['web']['vagrant']['box_url']

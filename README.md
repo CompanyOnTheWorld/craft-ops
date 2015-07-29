@@ -69,9 +69,8 @@ it will just work.
 ##### Bower
 
 You can add all of your bower components to the `bower.json` file at the root of the
-project.  Just run `bower install` within the `dev` vm (`vagrant ssh dev`) and these
-assets will end up being output to  `assets/vendor` and therefore available at
-`http://localhost:8000/static/vendor`.
+project.  Just run `bower install` and anything within `bower_components` will be
+available at `http://localhost:8000/static/vendor`.
 
 ##### Browserify
 
@@ -79,7 +78,7 @@ assets will end up being output to  `assets/vendor` and therefore available at
 break your code up into `modules` the same way you would with Node.js.Browserify
 is a nice improvement to the complex API of RequireJS and AMD, while offering the
 same advantages. It also handily bundles all of your code into a single file so
-that you cut down on HTTP requests. By default any changes to `assets/js/main.js`
+that you cut down on HTTP requests. By default any changes to `assets/js/_main.js`
 will automatically be output to `assets/js/bundle.js`. Since everything in the
 `assets` folder is passing through harp, the file will be available at
 `http://localhost:8000/static/js/bundle.js`.

@@ -252,7 +252,7 @@ node_global_watchify:
             "user": user
         },
         "watchify": {
-            "command": "watchify js/main.js -o js/bundle.js",
+            "command": "watchify js/_main.js -o js/bundle.js --poll",
             "directory": assets_path,
             "user": user
         },
@@ -288,6 +288,13 @@ install_bower_components:
     - user: {{ user }}
     - require:
       - file: {{ user }}_bowerrc
+
+install_node_modules:
+  cmd.run:
+    - name: npm install --no-bin-links
+    - cwd: {{ project_path }}
+    - user: {{ user }}
+    - onlyif: test -f {{ project_path }}/package.json
 
 {{ user }}_git_config:
   file.managed:
