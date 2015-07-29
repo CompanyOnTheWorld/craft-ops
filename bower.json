@@ -1,4 +1,5 @@
 {
+  "name": "Craft Ops",
   "dependencies": {
     "furtive": "~2.1.0"
   }
