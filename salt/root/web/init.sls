@@ -57,7 +57,8 @@ node_global_browserify:
 {% set uploads_path = home + "/shared/assets" -%}
 {% set php_vendor_path = home + "/shared/vendor" -%}
 {% set plugins_path = home + "/shared/plugins" -%}
-{% set craft_path = home + "/shared/vendor/Craft-Release-master" -%}
+{% set craft_path = home + "/shared/vendor/Craft-Release-" + project['craft']['ref'] -%}
+{% set plugins = project['craft']['plugins'] %}
 
 {{ env(user, group) }}
 
@@ -155,13 +156,13 @@ node_global_browserify:
 {{ user }}_download_craft:
   archive.extracted:
     - name: {{ home }}/shared/vendor
-    - source: {{ project['craft']['source'] }}
-    - source_hash: {{ project['craft']['source_hash'] }}
+    - source: https://github.com/pixelandtonic/Craft-Release/archive/{{ project['craft']['ref'] }}.tar.gz
+    - source_hash: md5={{ project['craft']['md5'] }}
     - archive_format: tar
     - archive_user: {{ home }}
     - if_missing: {{ craft_path }}
 
-{{ home }}/shared/vendor/Craft-Release-master:
+{{ craft_path }}:
   file.directory:
     - user: {{ user }}
     - group: {{ group }}
@@ -176,21 +177,23 @@ node_global_browserify:
     - group: {{ group }}
     - makedirs: True
 
-{{ user }}_download_guzzle_plugin:
+{% for plugin in plugins %}
+{{ user }}_download_craft_{{ plugin['name'] }}_plugin:
   archive.extracted:
     - name: {{ php_vendor_path }}
-    - source: https://github.com/davist11/craft-guzzle/archive/master.tar.gz 
-    - source_hash: md5=8758bcc8e33ba59dacca7c3ead7a31eb
+    - source: https://github.com/{{ plugin['author'] }}/{{ plugin['repo_name'] }}/archive/{{ plugin['ref'] }}.tar.gz 
+    - source_hash: md5={{ plugin['md5'] }}
     - archive_format: tar
     - user: {{ user }}
     - group: {{ group }}
-    - if_missing: {{ php_vendor_path }}/craft-guzzle-master
+    - if_missing: {{ php_vendor_path }}/{{ plugin['repo_name'] }}-{{ plugin['ref'] }}
 
-{{ home }}/shared/plugins/guzzle:
+{{ home }}/shared/plugins/{{ plugin['name'] }}:
   file.symlink:
     - user: {{ user }}
     - group: {{ group }}
-    - target: {{ php_vendor_path }}/craft-guzzle-master/guzzle
+    - target: {{ php_vendor_path }}/{{ plugin['repo_name'] }}-{{ plugin['ref'] }}/{{ plugin['name'] }}
+{% endfor %}
 
 {{ user }}_bowerrc:
   file.managed:

@@ -32,8 +32,9 @@
 {{ mysql_user_db(mysql_user, mysql_pass) }}
 
 {% set uploads_path = project_path + "/public/assets" -%}
-{% set php_vendor_path = home + "/vendor" -%}
-{% set craft_path = php_vendor_path + "/Craft-Release-master" -%}
+{% set php_vendor_path = project_path + "/vendor" -%}
+{% set craft_path = php_vendor_path + "/Craft-Release-" + project['craft']['ref'] -%}
+{% set plugins = project['craft']['plugins'] %}
 
 python_requirements:
   pip.installed:
@@ -116,8 +117,8 @@ install_legit_aliases:
 download_craft:
   archive.extracted:
     - name: {{ php_vendor_path }}
-    - source: {{ project['craft']['source'] }}
-    - source_hash: {{ project['craft']['source_hash'] }}
+    - source: https://github.com/pixelandtonic/Craft-Release/archive/{{ project['craft']['ref'] }}.tar.gz
+    - source_hash: md5={{ project['craft']['md5'] }}
     - archive_format: tar
     - user: {{ user }}
     - group: {{ group }}
@@ -156,17 +157,18 @@ download_craft:
     - group: {{ group }}
     - target: {{ project_path }}/templates
 
-download_craft_guzzle_plugin:
+{% for plugin in plugins %}
+download_craft_{{ plugin['name'] }}_plugin:
   archive.extracted:
     - name: {{ php_vendor_path }}
-    - source: https://github.com/davist11/craft-guzzle/archive/master.tar.gz 
-    - source_hash: md5=8758bcc8e33ba59dacca7c3ead7a31eb
+    - source: https://github.com/{{ plugin['author'] }}/{{ plugin['repo_name'] }}/archive/{{ plugin['ref'] }}.tar.gz 
+    - source_hash: md5={{ plugin['md5'] }}
     - archive_format: tar
     - user: {{ user }}
     - group: {{ group }}
-    - if_missing: {{ php_vendor_path }}/craft-guzzle-master
+    - if_missing: {{ php_vendor_path }}/{{ plugin['repo_name'] }}-{{ plugin['ref'] }}
 
-{{ php_vendor_path }}/craft-guzzle-master:
+{{ php_vendor_path }}/{{ plugin['repo_name'] }}-{{ plugin['ref'] }}:
   file.directory:
     - user: {{ user }}
     - group: {{ group }}
@@ -175,11 +177,12 @@ download_craft_guzzle_plugin:
       - user
       - group
 
-{{ home }}/plugins/guzzle:
+{{ home }}/plugins/{{ plugin['name'] }}:
   file.symlink:
     - user: {{ user }}
     - group: {{ group }}
-    - target: {{ php_vendor_path }}/craft-guzzle-master/guzzle
+    - target: {{ php_vendor_path }}/{{ plugin['repo_name'] }}-{{ plugin['ref'] }}/{{ plugin['name'] }}
+{% endfor %}
 
 php5-mcrypt:
   pkg.installed
@@ -244,25 +247,6 @@ node_global_watchify:
     - unless: npm -g ls watchify | grep watchify
     - require:
       - pkg: nodejs
-
-{{ supervise("dev", home, user, group, {
-        "harp": {
-            "command": "harp server",
-            "directory": assets_path,
-            "user": user
-        },
-        "watchify": {
-            "command": "watchify js/_main.js -o js/bundle.js --poll",
-            "directory": assets_path,
-            "user": user
-        },
-        "wetty": {
-          "command": "wetty -p 3000 --sshuser=vagrant",
-            "directory": project_path,
-            "user": user
-        }
-    })
-}}
 
 /etc/rc.local:
   file.managed:
@@ -334,5 +318,24 @@ install_node_modules:
       {% endif %}
       uploads_path: {{ uploads_path }}
       craft_path: {{ craft_path }}
+
+{{ supervise("dev", home, user, group, {
+        "harp": {
+            "command": "harp server",
+            "directory": assets_path,
+            "user": user
+        },
+        "watchify": {
+          "command": "watchify -t [ jstify --noMinify ] js/_main.js -o js/bundle.js",
+            "directory": assets_path,
+            "user": user
+        },
+        "wetty": {
+          "command": "wetty -p 3000 --sshuser=vagrant",
+            "directory": project_path,
+            "user": user
+        }
+    })
+}}
 
 # vim: set ft=yaml ts=2 sw=2 sts=2 et ai :
