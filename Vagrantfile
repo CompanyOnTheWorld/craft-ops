@@ -40,15 +40,21 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     dev.vm.synced_folder ".", "/project"
 
     if File.exist?(ENV['HOME']+'/ops.conf')
-      dev.vm.provision :file, source: '~/ops.conf', destination: $project['dev']['ops_conf_path']
+      dev.vm.provision :file,
+        source: '~/ops.conf',
+        destination: $project['dev']['ops_conf_path']
     end
 
-    dev.vm.provision :shell, path: $salt_install,
-      :args => '-P', :keep_color => true
+    dev.vm.provision :shell,
+      path: $salt_install,
+      :args => '-P',
+      :keep_color => true
 
-    dev.vm.provision :shell, inline: 'sudo cp /project/salt/config/dev.conf /etc/salt/minion'
+    dev.vm.provision :shell,
+      inline: 'sudo cp /project/salt/config/dev.conf /etc/salt/minion'
 
-    dev.vm.provision :shell, path: $stackstrap_install,
+    dev.vm.provision :shell,
+      path: $stackstrap_install,
       :args => "--project_config='#{$project.to_json}'",
       :keep_color => true
 
@@ -99,12 +105,26 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     end
 
     if File.exist?(ENV['HOME']+'/ops.conf')
-      web.vm.provision :file, source: '~/ops.conf', destination: $project['web']['admin']['ops_conf_path']
+      web.vm.provision :file,
+      source: '~/ops.conf',
+      destination: $project['web']['admin']['ops_conf_path']
     end
 
-    web.vm.provision :shell, path: $salt_install, :args => "-P", :keep_color => true
-    web.vm.provision :shell, inline: 'sudo cp /project/salt/config/web.conf /etc/salt/minion'
-    web.vm.provision :shell, path: $stackstrap_install, :args => "--project_config='#{$project.to_json}'", :keep_color => true
+    web.vm.provision :shell,
+      path: $salt_install,
+      :args => "-P",
+      :keep_color => true
+
+    web.vm.provision :shell,
+      inline: 'sudo cp /project/salt/config/web.conf /etc/salt/minion'
+
+    web.vm.provision :shell,
+      path: $stackstrap_install,
+      :keep_color => true
+
+    web.vm.provision :shell,
+      inline: "sudo salt-call state.highstate --retcode-passthrough --log-level=info pillar='#{$project.to_json}'",
+      :keep_color => true
 
   end
 
