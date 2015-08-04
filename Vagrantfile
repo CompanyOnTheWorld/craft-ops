@@ -43,9 +43,29 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       dev.vm.provision :file, source: '~/ops.conf', destination: $project['dev']['ops_conf_path']
     end
 
-    dev.vm.provision :shell, path: $salt_install, :args => '-P', :keep_color => true
+    dev.vm.provision :shell, path: $salt_install,
+      :args => '-P', :keep_color => true
+
     dev.vm.provision :shell, inline: 'sudo cp /project/salt/config/dev.conf /etc/salt/minion'
-    dev.vm.provision :shell, path: $stackstrap_install, :args => "--project_config='#{$project.to_json}'", :keep_color => true
+
+    dev.vm.provision :shell, path: $stackstrap_install,
+      :args => "--project_config='#{$project.to_json}'",
+      :keep_color => true
+
+    if (/cygwin|mswin|mingw|bccwin|wince|emx/ =~ RUBY_PLATFORM) != nil
+      dev.vm.provision :shell,
+        inline: 'sudo salt-call grains.setval vagrant_host_os windows'
+    elsif (/darwin/ =~ RUBY_PLATFORM) != nil
+      dev.vm.provision :shell,
+        inline: 'sudo salt-call grains.setval vagrant_host_os osx'
+    else
+      dev.vm.provision :shell,
+        inline: 'sudo salt-call grains.setval vagrant_host_os linux'
+    end
+
+    dev.vm.provision :shell,
+      inline: "sudo salt-call state.highstate --retcode-passthrough --log-level=info pillar='#{$project.to_json}'",
+      :keep_color => true
 
   end
 

@@ -33,6 +33,10 @@
 
 {% set uploads_path = project_path + "/public/assets" -%}
 {% set php_vendor_path = project_path + "/vendor" -%}
+{% set vagrant_host_os = salt['grains.get']('vagrant_host_os', '') %}
+{% if vagrant_host_os == 'windows' %}
+  {% set php_vendor_path = home + "/vendor" -%}
+{% endif %}
 {% set craft_path = php_vendor_path + "/Craft-Release-" + project['craft']['ref'] -%}
 {% set plugins = project['craft']['plugins'] %}
 
@@ -70,7 +74,7 @@ install_legit_aliases:
     - template: jinja
     - makedirs: True
     - user: {{ user }}
-  
+
 {{ php5_fpm_instance(user, group, '5000',
                      envs={
                        'CRAFT_ENVIRONMENT': 'local',
@@ -161,7 +165,7 @@ download_craft:
 download_craft_{{ plugin['name'] }}_plugin:
   archive.extracted:
     - name: {{ php_vendor_path }}
-    - source: https://github.com/{{ plugin['author'] }}/{{ plugin['repo_name'] }}/archive/{{ plugin['ref'] }}.tar.gz 
+    - source: https://github.com/{{ plugin['author'] }}/{{ plugin['repo_name'] }}/archive/{{ plugin['ref'] }}.tar.gz
     - source_hash: md5={{ plugin['md5'] }}
     - archive_format: tar
     - user: {{ user }}
@@ -204,7 +208,7 @@ php5-restart:
   file.directory:
     - user: {{ user }}
     - group: {{ group }}
-    - mode: 755 
+    - mode: 755
 
 {{ home }}/.aws/config:
   file.managed:
@@ -214,14 +218,14 @@ php5-restart:
     - group: {{ group }}
     - mode: 600
     - defaults:
-        aws_access_key: {{ aws_access_key }} 
-        aws_secret_key: {{ aws_secret_key }} 
+        aws_access_key: {{ aws_access_key }}
+        aws_secret_key: {{ aws_secret_key }}
         region: us-east-1
 {% endif %}
 
 install_vagrant:
   pkg.installed:
-    - sources: 
+    - sources:
       - vagrant: https://dl.bintray.com/mitchellh/vagrant/vagrant_1.7.2_x86_64.deb
 
 install_vagrant_aws:
