@@ -120,6 +120,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
     web.vm.provision :shell,
       path: $stackstrap_install,
+      :args => "--project_config='#{$project.to_json}'",
       :keep_color => true
 
     web.vm.provision :shell,
