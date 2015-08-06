@@ -104,12 +104,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       override.ssh.private_key_path = $project['web']['admin']['private_key_path']
     end
 
-    if File.exist?(ENV['HOME']+'/ops.conf')
-      web.vm.provision :file,
-      source: '~/ops.conf',
-      destination: $project['web']['admin']['ops_conf_path']
-    end
-
     web.vm.provision :shell,
       path: $salt_install,
       :args => "-P",
