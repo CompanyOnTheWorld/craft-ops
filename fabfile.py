@@ -139,6 +139,10 @@ def deploy(branch="master"):
         run("rm -rf $CRAFT_PATH/config")
         run("ln -s $HOME/current/craft/config $CRAFT_PATH/config")
 
+        if project['craft']['translations']:
+            run("rm -rf $CRAFT_PATH/translations")
+            run("ln -s $HOME/current/craft/translations $CRAFT_PATH/translations")
+
         run("rm -rf $CRAFT_PATH/templates")
         run("ln -s $HOME/current/templates $CRAFT_PATH/templates")
 
