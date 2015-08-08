@@ -298,9 +298,8 @@ def setup(method=False):
         security_group = json.loads(local("aws ec2 create-security-group --vpc-id "+vpc['VpcId']+"  --group-name "+project['name']+" --description 'Web server.'", capture=True))
         print security_group 
 
-        local("aws ec2 authorize-security-group-ingress --group-id "+security_group['GroupId']+" --protocol tcp --port 22 --cidr 0.0.0.0/0")
-        local("aws ec2 authorize-security-group-ingress --group-id "+security_group['GroupId']+" --protocol tcp --port 80 --cidr 0.0.0.0/0")
-        local("aws ec2 authorize-security-group-ingress --group-id "+security_group['GroupId']+" --protocol tcp --port 443 --cidr 0.0.0.0/0")
+        for port in project['web']['open_ports']:
+            local("aws ec2 authorize-security-group-ingress --group-id "+security_group['GroupId']+" --protocol tcp --port "+port+" --cidr 0.0.0.0/0")
 
         project_yaml['aws']['security_groups'] = [security_group['GroupId']]
 
